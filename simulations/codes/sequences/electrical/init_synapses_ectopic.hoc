@@ -1,0 +1,91 @@
+/*--------------------------------------------------------
+procedures to insert synapses with AMPAR and NMDAR
+
+AMPA is modelled with the built-in function AlphaSynapse
+NMDA is modelled with mechanisms from Kampa et al. 2004 
+
+Tiago Branco (2010)
+--------------------------------------------------------*/
+
+proc init_ect_syn_params(){
+    AMPAtau = 2
+    AMPAgmax = 0.0005       //500 pS
+    NMDAgmax = 8000         //8000 pS (Popen is 0.2 so effective gmax = 1600 pS, use 5000 pS for active model)
+}
+
+
+// read file with sequence synapse location
+objref mloc, floc, rloc
+floc = new File("./synapse_loc_5.dat")
+floc.ropen()
+mloc = new Matrix()
+mloc.scanf(floc)
+
+
+// read file with ectopic synapse location
+objref emloc, efloc, erloc
+efloc = new File("./ectopic_synapse_loc_5.dat")
+efloc.ropen()
+emloc = new Matrix()
+emloc.scanf(efloc)
+
+
+nsyn = 1
+ensyn = 1
+tot_syn = 1
+proc init_ect_syns(){
+  nsyn = $1
+  ensyn = $2
+  tot_syn = nsyn + ensyn
+  objectvar cAMPA[tot_syn], cNMDA[tot_syn]
+  create PRE[tot_syn]
+    
+  for n = 0, nsyn-1 {
+    dendid = mloc.x[n][0]
+    pos = mloc.x[n][1]
+    print n, pos
+    addAMPA(dendid, pos, n)
+    addPRE(n)
+    addNMDA(dendid, pos, n) 
+  }
+
+  for en = 0, ensyn-1 {
+    dendid = emloc.x[en][0]
+    pos = emloc.x[en][1]
+    print en, pos
+    addAMPA(dendid, pos, en+nsyn)
+    addPRE(en+nsyn)
+    addNMDA(dendid, pos, en+nsyn) 
+  }
+}
+
+
+objectvar cAMPA[1]
+proc addAMPA(){
+  n = $3
+	cAMPA[n] = new AlphaSynapse()
+	dend[$1] cAMPA[n].loc($2)
+	cAMPA[n].tau = AMPAtau 
+  cAMPA[n].gmax = AMPAgmax
+}
+
+create PRE[1]
+proc addPRE(){
+  n = $1
+	PRE[n] {diam=1 L=1}
+	PRE[n] {insert rel}
+	PRE[n].dur_rel = 0.5
+	PRE[n].amp_rel = 2
+}
+
+objectvar cNMDA[tot_syn]
+proc addNMDA(){
+  n = $3
+	cNMDA[n] = new NMDA_Mg_T()
+	dend[$1] cNMDA[n].loc($2)
+	cNMDA[n].gmax = NMDAgmax
+	setpointer cNMDA[n].C, PRE[n].T_rel(0.5)
+	Erev_NMDA_Mg = 5
+	mg_NMDA_Mg_T = 1
+}
+

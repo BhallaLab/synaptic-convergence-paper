@@ -1,0 +1,129 @@
+/*--------------------------------------------------------
+
+Start simulation with a passive model, placing 9 equally spaced
+synapses on a basal dendrite and activating them in two opposite
+sequences (IN and OUT) at increasing stimulation intervals (0-5 ms)
+
+Synapse location: synapse_loc.dat (syn 0 is most distal)
+
+Stimulation sequence: order_single.dendrite.dat
+
+
+Tiago Branco (2010)
+--------------------------------------------------------*/
+
+//load cell morphology and add passive and active properties
+
+xopen("./rc19.hoc")
+xopen("./init_biophys.hoc")
+xopen("./init_synapses_ectopic.hoc")
+
+
+//read the ectopic time points
+objref emtime, eftime, ertime
+eftime = new File("./ectopic_input_time_5.dat")
+eftime.ropen()
+emtime = new Matrix()
+emtime.scanf(eftime)
+
+
+init_params()
+init_passive()
+//init_active_params()   //uncoment to make model active
+//init_active()	       //uncoment to make model active
+init_ect_syn_params()
+
+
+//add synapses 
+nsyn = mloc.nrow
+ensyn = emloc.nrow
+init_ect_syns(nsyn, ensyn)
+
+tstop = 200
+//start panels and graphs
+proc PlotV() {
+    newPlot (0, tstop, $1, $2)
+    graphItem.save_name("graphList[0].")
+    graphList[0].append(graphItem)
+    graphItem.addexpr("v(.5)")
+}
+
+PlotV(v_init-5, -30)
+nrncontrolmenu()
+
+// read file with stimulation order
+objref morder, forder
+forder = new File("./synapse_order_5.dat")
+forder.ropen()
+morder = new Matrix()
+morder.scanf(forder)
+
+nTs = 1   //number of time intervals 
+tonset = 50   // Time of stimulus onset
+ti = 3    //time intervale between inputs
+nSeq = morder.nrow   //number of different sequences to test
+nEctPos = emloc.nrow //number of positions for ectopic inputs
+nEctTime = emtime.nrow //number of time-points for ectopic inputs
+
+
+//setup recording vectors
+objref storev, recv, storeMes
+storev = new Matrix(nEctTime*nEctPos*nSeq, tstop/dt)  //to store the somatic voltage trace for different intervals on one sequence
+recv = new Vector()
+recv.record(&soma.v(0.5))
+storeMes = new Matrix(nSeq*nEctTime*nEctPos, 4) //to store the EPSP peak for each condition
+
+
+//go for it
+counter = 0
+for net=0, nEctTime-1 { 
+
+  for nep=0, nEctPos-1 {
+
+    for n = 0, nSeq-1 {
+        
+      access soma
+      
+      for od=0, nsyn-1 {  
+
+        s  = morder.x[n][od] 
+        cAMPA[s].onset = tonset + od*ti 
+        PRE[s].del_rel = tonset + od*ti 
+      } 
+
+      for en=0, ensyn-1 {  
+        cAMPA[en+nsyn].onset = tstop*5
+        PRE[en+nsyn].del_rel = tstop*5
+      }
+      cAMPA[nsyn+nep].onset = tonset + emtime.x[net][0]*ti 
+      PRE[nsyn+nep].del_rel = tonset + emtime.x[net][0]*ti 
+
+      run()
+
+      for t = 0, storev.ncol-1 {
+          storev.x[(net*nEctPos*nSeq) + (nep*nSeq) + n][t] = recv.x[t]  
+          recv.x[t] = recv.x[t] - v_init
+      }
+      storeMes.x[counter][0] = n
+      storeMes.x[counter][1] = emloc.x[nep][1]
+      storeMes.x[counter][2] = emtime.x[net][0]
+      storeMes.x[counter][3] = recv.max()
+      counter += 1
+    }
+  }
+}
+
+
+
+//save data
+objref savv, savm
+//savv = new File()
+savm = new File()
+//savv.wopen("./tempV_panelE.dat")
+savm.wopen("./tempM_5_panelE.dat")
+//storev.fprint(0, savv, "%f ")
+storeMes.fprint(0, savm, "%f ")  
+//savv.close()
+savm.close()
+
+
