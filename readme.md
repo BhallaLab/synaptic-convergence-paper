@@ -4,7 +4,7 @@ This readme describes the steps to reproduce the paper figures
 ## Software versions
 - PYHTON : 3.10.12 
 - NEURON : 8.2.3 
-- MOOSE : 4.0.0.dev20240102 (pymoose)
+- MOOSE : 4.0.0 (pymoose)
 - Version numbers of all python packages are listed in the requirements.txt file present in the repository. 
 
 ## Setting up
