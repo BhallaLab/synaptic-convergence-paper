@@ -10,7 +10,6 @@ import numpy as np
 import sys
 import matplotlib.pyplot as plt
 import matplotlib.lines as mlines
-import matplotlib.image as mpimg
 import matplotlib.ticker as mticker
 import seaborn as sns
 from matplotlib import cm
@@ -33,9 +32,6 @@ networks = [
     prm.cortex_elec,
 ]
 colors = sns.color_palette("muted", n_colors=len(networks))
-
-MIN_M = prm.MIN_M
-MAX_M = prm.MAX_M
 
 
 def plot_conn_prob_vs_p_seq(ax, net, M):
@@ -272,7 +268,6 @@ def plot_p_noise_seq_vs_noise(ax, net, M):
     """
     # Parameters of cortex_cicr
     p = net["connection_prob"]
-    p_e = net["ensemble_participation_prob"]
     N = net["ensemble_size"]
     L = net["dendrite_length"]
     R = np.logspace(-3, 1, num=9)
