@@ -61,8 +61,8 @@ def plot_conn_prob_vs_p_seq(ax, net, M):
     bg_prob = 1 - np.exp(-R * D)
     num_synapses = np.array([int(j * t_pop_pre) for j in p])
 
-    E_cpsd = p * N * np.power(p * N * delta / L, M - 1)
-    E_apsd = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
+    E_cposs = p * N * np.power(p * N * delta / L, M - 1)
+    E_aposs = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
     E_all_seq = (p * p_e * N + bg_prob * (num_synapses - p * N)) * np.power(
         (p * p_e * N + bg_prob * (num_synapses - p * N)) * delta / L, M - 1
     )
@@ -71,19 +71,19 @@ def plot_conn_prob_vs_p_seq(ax, net, M):
         * (num_synapses - p * N)
         * np.power(bg_prob * (num_synapses - p * N) * delta / L, M - 1)
     )
-    E_gap_fill_seq = E_all_seq - E_noise_seq - E_apsd
+    E_gap_fill_seq = E_all_seq - E_noise_seq - E_aposs
 
-    p_cpsd_seq = 1 - np.exp(-E_cpsd)
-    p_apsd_seq = 1 - np.exp(-E_apsd)
+    p_cposs_seq = 1 - np.exp(-E_cposs)
+    p_aposs_seq = 1 - np.exp(-E_aposs)
     p_noise_seq = 1 - np.exp(-E_noise_seq)
     p_gap_fill_seq = 1 - np.exp(-E_gap_fill_seq)
     p_any_seq = 1 - np.exp(-E_all_seq)
 
-    ax.plot(p, p_cpsd_seq, "-o", c="b", label="cpsd")
-    ax.plot(p, p_apsd_seq, ":o", c="b", label="apsd")
-    ax.plot(p, p_gap_fill_seq, ":s", c="c", label="gap-fill")
-    ax.plot(p, p_noise_seq, ":+", c="r", label="noise")
-    ax.plot(p, p_any_seq, ":x", c="k", label="any")
+    ax.plot(p, p_cposs_seq, "-o", c="b", label="cPOSS")
+    ax.plot(p, p_aposs_seq, ":o", c="b", label="aPOSS")
+    ax.plot(p, p_gap_fill_seq, ":s", c="c", label="GS")
+    ax.plot(p, p_noise_seq, ":+", c="r", label="NS")
+    ax.plot(p, p_any_seq, ":x", c="k", label="AS")
 
     sns.despine()
     ax.set_xscale("log", nonpositive="mask")
@@ -92,7 +92,7 @@ def plot_conn_prob_vs_p_seq(ax, net, M):
     ax.set_xlabel("Connection probability, p")
     ax.set_ylabel("p_seq")
     ax.set_xticks([1e-2, 1e-1, 1e0])
-    ax.legend(frameon=False)
+    ax.legend(title="Legend for A,B,C,D", frameon=False)
 
 
 def plot_ensemble_participation_prob_vs_p_group(ax, net, M):
@@ -118,8 +118,8 @@ def plot_ensemble_participation_prob_vs_p_group(ax, net, M):
     bg_prob = 1 - np.exp(-R * D)
     num_synapses = int(p * t_pop_pre)
 
-    E_cpsd = p * N * np.power(p * N * delta / L, M - 1)
-    E_apsd = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
+    E_cposs = p * N * np.power(p * N * delta / L, M - 1)
+    E_aposs = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
     E_all_seq = (p * p_e * N + bg_prob * (num_synapses - p * N)) * np.power(
         (p * p_e * N + bg_prob * (num_synapses - p * N)) * delta / L, M - 1
     )
@@ -128,19 +128,19 @@ def plot_ensemble_participation_prob_vs_p_group(ax, net, M):
         * (num_synapses - p * N)
         * np.power(bg_prob * (num_synapses - p * N) * delta / L, M - 1)
     )
-    E_gap_fill_seq = E_all_seq - E_noise_seq - E_apsd
+    E_gap_fill_seq = E_all_seq - E_noise_seq - E_aposs
 
-    p_cpsd_seq = [1 - np.exp(-E_cpsd)] * len(p_e)
-    p_apsd_seq = 1 - np.exp(-E_apsd)
+    p_cposs_seq = [1 - np.exp(-E_cposs)] * len(p_e)
+    p_aposs_seq = 1 - np.exp(-E_aposs)
     p_noise_seq = [1 - np.exp(-E_noise_seq)] * len(p_e)
     p_gap_fill_seq = 1 - np.exp(-E_gap_fill_seq)
     p_any_seq = 1 - np.exp(-E_all_seq)
 
-    ax.plot(p_e, p_cpsd_seq, "-o", c="b", label="cpsd")
-    ax.plot(p_e, p_apsd_seq, ":o", c="b", label="apsd")
-    ax.plot(p_e, p_gap_fill_seq, ":s", c="c", label="gap-fill")
-    ax.plot(p_e, p_noise_seq, ":+", c="r", label="noise")
-    ax.plot(p_e, p_any_seq, ":x", c="k", label="any")
+    ax.plot(p_e, p_cposs_seq, "-o", c="b", label="cPOSS")
+    ax.plot(p_e, p_aposs_seq, ":o", c="b", label="aPOSS")
+    ax.plot(p_e, p_gap_fill_seq, ":s", c="c", label="GS")
+    ax.plot(p_e, p_noise_seq, ":+", c="r", label="NS")
+    ax.plot(p_e, p_any_seq, ":x", c="k", label="AS")
 
     sns.despine()
     ax.set_yscale("log", nonpositive="mask")
@@ -172,8 +172,8 @@ def plot_input_zone_width_vs_p_seq(ax, net, M):
     bg_prob = 1 - np.exp(-R * D)
     num_synapses = int(p * t_pop_pre)
 
-    E_cpsd = p * N * np.power(p * N * delta / L, M - 1)
-    E_apsd = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
+    E_cposs = p * N * np.power(p * N * delta / L, M - 1)
+    E_aposs = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
     E_all_seq = (p * p_e * N + bg_prob * (num_synapses - p * N)) * np.power(
         (p * p_e * N + bg_prob * (num_synapses - p * N)) * delta / L, M - 1
     )
@@ -182,19 +182,19 @@ def plot_input_zone_width_vs_p_seq(ax, net, M):
         * (num_synapses - p * N)
         * np.power(bg_prob * (num_synapses - p * N) * delta / L, M - 1)
     )
-    E_gap_fill_seq = E_all_seq - E_noise_seq - E_apsd
+    E_gap_fill_seq = E_all_seq - E_noise_seq - E_aposs
 
-    p_cpsd_seq = 1 - np.exp(-E_cpsd)
-    p_apsd_seq = 1 - np.exp(-E_apsd)
+    p_cposs_seq = 1 - np.exp(-E_cposs)
+    p_aposs_seq = 1 - np.exp(-E_aposs)
     p_noise_seq = 1 - np.exp(-E_noise_seq)
     p_gap_fill_seq = 1 - np.exp(-E_gap_fill_seq)
     p_any_seq = 1 - np.exp(-E_all_seq)
 
-    ax.plot(delta, p_cpsd_seq, "-o", c="b", label="cpsd")
-    ax.plot(delta, p_apsd_seq, ":o", c="b", label="apsd")
-    ax.plot(delta, p_gap_fill_seq, ":s", c="c", label="gap-fill")
-    ax.plot(delta, p_noise_seq, ":+", c="r", label="noise")
-    ax.plot(delta, p_any_seq, ":x", c="k", label="any")
+    ax.plot(delta, p_cposs_seq, "-o", c="b", label="cPOSS")
+    ax.plot(delta, p_aposs_seq, ":o", c="b", label="aPOSS")
+    ax.plot(delta, p_gap_fill_seq, ":s", c="c", label="GS")
+    ax.plot(delta, p_noise_seq, ":+", c="r", label="NS")
+    ax.plot(delta, p_any_seq, ":x", c="k", label="AS")
 
     sns.despine()
     ax.set_yscale("log", nonpositive="mask")
@@ -226,8 +226,8 @@ def plot_ensemble_size_vs_p_seq(ax, net, M):
     bg_prob = 1 - np.exp(-R * D)
     num_synapses = int(p * t_pop_pre)
 
-    E_cpsd = p * N * np.power(p * N * delta / L, M - 1)
-    E_apsd = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
+    E_cposs = p * N * np.power(p * N * delta / L, M - 1)
+    E_aposs = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
     E_all_seq = (p * p_e * N + bg_prob * (num_synapses - p * N)) * np.power(
         (p * p_e * N + bg_prob * (num_synapses - p * N)) * delta / L, M - 1
     )
@@ -236,19 +236,19 @@ def plot_ensemble_size_vs_p_seq(ax, net, M):
         * (num_synapses - p * N)
         * np.power(bg_prob * (num_synapses - p * N) * delta / L, M - 1)
     )
-    E_gap_fill_seq = E_all_seq - E_noise_seq - E_apsd
+    E_gap_fill_seq = E_all_seq - E_noise_seq - E_aposs
 
-    p_cpsd_seq = 1 - np.exp(-E_cpsd)
-    p_apsd_seq = 1 - np.exp(-E_apsd)
+    p_cposs_seq = 1 - np.exp(-E_cposs)
+    p_aposs_seq = 1 - np.exp(-E_aposs)
     p_noise_seq = 1 - np.exp(-E_noise_seq)
     p_gap_fill_seq = 1 - np.exp(-E_gap_fill_seq)
     p_any_seq = 1 - np.exp(-E_all_seq)
 
-    ax.plot(N, p_cpsd_seq, "-o", c="b", label="cpsd")
-    ax.plot(N, p_apsd_seq, ":o", c="b", label="apsd")
-    ax.plot(N, p_gap_fill_seq, ":s", c="c", label="gap-fill")
-    ax.plot(N, p_noise_seq, ":+", c="r", label="noise")
-    ax.plot(N, p_any_seq, ":x", c="k", label="any")
+    ax.plot(N, p_cposs_seq, "-o", c="b", label="cPOSS")
+    ax.plot(N, p_aposs_seq, ":o", c="b", label="aPOSS")
+    ax.plot(N, p_gap_fill_seq, ":s", c="c", label="GS")
+    ax.plot(N, p_noise_seq, ":+", c="r", label="NS")
+    ax.plot(N, p_any_seq, ":x", c="k", label="AS")
 
     sns.despine()
     ax.set_xscale("log", nonpositive="mask")
@@ -352,7 +352,7 @@ def plot_p_gapfill_vs_p_fp_seq(ax, net, M):
     bg_prob = 1 - np.exp(-R * D)
     num_synapses = int(p * t_pop_pre)
 
-    E_apsd = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
+    E_aposs = p * p_e * N * np.power(p * p_e * N * delta / L, M - 1)
     E_all_seq = (p * p_e * N + bg_prob * (num_synapses - p * N)) * np.power(
         (p * p_e * N + bg_prob * (num_synapses - p * N)) * delta / L, M - 1
     )
@@ -361,9 +361,9 @@ def plot_p_gapfill_vs_p_fp_seq(ax, net, M):
         * (num_synapses - p * N)
         * np.power(bg_prob * (num_synapses - p * N) * delta / L, M - 1)
     )
-    E_gap_fill_seq = E_all_seq - E_noise_seq - E_apsd
+    E_gap_fill_seq = E_all_seq - E_noise_seq - E_aposs
 
-    E_fp_seq = E_all_seq - E_apsd
+    E_fp_seq = E_all_seq - E_aposs
 
     ax.scatter(E_fp_seq, E_gap_fill_seq, c="r", s=np.log(N) * scaling_factor)
     ax.plot(E_fp_seq, E_gap_fill_seq, c="r", ls="--")
