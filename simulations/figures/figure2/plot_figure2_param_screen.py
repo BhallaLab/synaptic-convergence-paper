@@ -12,12 +12,9 @@
 import sys
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 from matplotlib import cm
 from matplotlib.colors import LogNorm
 import seaborn as sns
-import pandas as pd
-from scipy.linalg import expm
 import matplotlib.ticker as mticker
 from scipy.stats import poisson
 
@@ -41,11 +38,6 @@ networks = [
 ]
 colors = sns.color_palette("muted", n_colors=len(networks))
 
-MIN_M = prm.MIN_M
-MAX_M = prm.MAX_M
-T_POP_POST = 4000
-NUM_RUNS = 100
-
 
 def plot_conn_prob_vs_p_group(ax, net, m):
     """Plot connection probability vs probability of group
@@ -66,70 +58,23 @@ def plot_conn_prob_vs_p_group(ax, net, m):
     t_pop_pre = net["population_size"]
     R = net["background_rate"]
     D = net["input_duration"]
+    p_bg = 1 - np.exp(-R * D)
 
-    # True connected group
-    p_total_exp_fit = []
-    for p_i in p:
-        sigma = L / int(p_i * t_pop_pre)
-        q = N / t_pop_pre
-        x = q * L / sigma
-        y = L / Z
-        A = np.zeros((m + 1, m + 1))
-        for j in range(m):
-            A[j, j] = -(m - j) * x - j * y
-            A[j + 1, j] = (m - j) * x
-        for j in range(m - 1):
-            A[j, j + 1] = (j + 1) * y
-        B = expm(A)
-        p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p, p_total_exp_fit, "-o", c="b", label="true connected")
-    # c = 0.7384796
+    # connectivity-based fully-mixed group
     c = 2.56141683
     egrp_exp_Ei = np.array([p_i * N * Z / L for p_i in p])
     p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
     p_total_exp_1 = 1 - np.power((1 - p_grp_exp), c * int(L / Z))
-    ax.plot(p, p_total_exp_1, "-o", c="b", label="true connected", alpha=0.7)
+    ax.plot(p, p_total_exp_1, "-o", c="b", label="cFMG", alpha=0.7)
 
-    # True active group
-    p_total_exp_fit = []
-    for p_i in p:
-        sigma = L / int(p_i * t_pop_pre)
-        q = p_e * N / t_pop_pre
-        x = q * L / sigma
-        y = L / Z
-        A = np.zeros((m + 1, m + 1))
-        for j in range(m):
-            A[j, j] = -(m - j) * x - j * y
-            A[j + 1, j] = (m - j) * x
-        for j in range(m - 1):
-            A[j, j + 1] = (j + 1) * y
-        B = expm(A)
-        p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p, p_total_exp_fit, ":o", c="b", label="true active")
-    # c = 0.74330444
+    # activity-based fully-mixed group
     c = 2.57658637
     egrp_exp_Ei = np.array([p_i * p_e * N * Z / L for p_i in p])
     p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
     p_total_exp_1 = 1 - np.power((1 - p_grp_exp), c * int(L / Z))
-    ax.plot(p, p_total_exp_1, ":o", c="b", label="true active", alpha=0.7)
+    ax.plot(p, p_total_exp_1, ":o", c="b", label="aFMG", alpha=0.7)
 
-    # Degenerate connected group
-    p_total_exp_fit = []
-    for p_i in p:
-        sigma = L / int(p_i * t_pop_pre)
-        q = (m * N) / t_pop_pre
-        x = q * L / sigma
-        y = L / Z
-        A = np.zeros((m + 1, m + 1))
-        for j in range(m):
-            A[j, j] = -x - j * y
-            A[j + 1, j] = x
-        for j in range(m - 1):
-            A[j, j + 1] = (j + 1) * y
-        B = expm(A)
-        p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p, p_total_exp_fit, "-s", c="c", label="degenerate connected")
-    # c = 0.66733867
+    # connectivity-based stimulus-driven group
     c = 2.62999896
     p_total_exp_1 = []
     for p_i in p:
@@ -138,25 +83,9 @@ def plot_conn_prob_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / Z)))
-    ax.plot(p, p_total_exp_1, "-s", c="c", label="degenerate connected", alpha=0.7)
+    ax.plot(p, p_total_exp_1, "-s", c="c", label="cSDG", alpha=0.7)
 
-    # Degenerate active group
-    p_total_exp_fit = []
-    for p_i in p:
-        sigma = L / int(p_i * t_pop_pre)
-        q = (p_e * m * N) / t_pop_pre
-        x = q * L / sigma
-        y = L / Z
-        A = np.zeros((m + 1, m + 1))
-        for j in range(m):
-            A[j, j] = -x - j * y
-            A[j + 1, j] = x
-        for j in range(m - 1):
-            A[j, j + 1] = (j + 1) * y
-        B = expm(A)
-        p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p, p_total_exp_fit, ":s", c="c", label="degenerate active")
-    # c = 0.67088243
+    # activity-based stimulus-driven group
     c = 2.63552124
     p_total_exp_1 = []
     for p_i in p:
@@ -165,61 +94,29 @@ def plot_conn_prob_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / Z)))
-    ax.plot(p, p_total_exp_1, ":s", c="c", label="degenerate active", alpha=0.7)
+    ax.plot(p, p_total_exp_1, ":s", c="c", label="aSDG", alpha=0.7)
 
-    # Noise group
-    p_total_exp_fit = []
-    for p_i in p:
-        sigma = L / int(p_i * t_pop_pre)
-        q = ((t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-        x = q * L / sigma
-        y = L / Z
-        A = np.zeros((m + 1, m + 1))
-        for j in range(m):
-            A[j, j] = -x - j * y
-            A[j + 1, j] = x
-        for j in range(m - 1):
-            A[j, j + 1] = (j + 1) * y
-        B = expm(A)
-        p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p, p_total_exp_fit, ":+", c="r", label="noise")
-    # c = 0.39755312
-    c = 2.30756123
+    # noise group
+    c = 2.440585586
     p_total_exp_1 = []
     for p_i in p:
         sigma = L / int(p_i * t_pop_pre)
-        ENoise_exp = R * D * Z * ((1 / sigma) - (p_i * N * m / L))
+        ENoise_exp = p_bg * Z * ((1 / sigma) - (p_i * N * m / L))
         p_noise_exp = 1 - np.sum([poisson.pmf(k=j, mu=ENoise_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_noise_exp), c * int(L / Z)))
-    ax.plot(p, p_total_exp_1, ":+", c="r", label="noise", alpha=0.7)
+    ax.plot(p, p_total_exp_1, ":+", c="r", label="NG", alpha=0.7)
 
-    # Any group
-    p_total_exp_fit = []
-    for p_i in p:
-        sigma = L / int(p_i * t_pop_pre)
-        q = (p_e * m * N + (t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-        x = q * L / sigma
-        y = L / Z
-        A = np.zeros((m + 1, m + 1))
-        for j in range(m):
-            A[j, j] = -x - j * y
-            A[j + 1, j] = x
-        for j in range(m - 1):
-            A[j, j + 1] = (j + 1) * y
-        B = expm(A)
-        p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p, p_total_exp_fit, ":x", c="k", label="any")
-    # c = 0.32892748
-    c = 2.10499296
+    # any group
+    c = 2.208905456
     p_total_exp_1 = []
     for p_i in p:
         sigma = L / int(p_i * t_pop_pre)
-        EAll_exp = R * D * Z * ((1 / sigma) - (p_i * N * m / L)) + (
+        EAll_exp = p_bg * Z * ((1 / sigma) - (p_i * N * m / L)) + (
             p_i * p_e * N * m * Z / L
         )
         p_any_exp = 1 - np.sum([poisson.pmf(k=j, mu=EAll_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_any_exp), c * int(L / Z)))
-    ax.plot(p, p_total_exp_1, ":x", c="k", label="any", alpha=0.7)
+    ax.plot(p, p_total_exp_1, ":x", c="k", label="AG", alpha=0.7)
 
     sns.despine()
     ax.set_xscale("log", nonpositive="mask")
@@ -249,29 +146,27 @@ def plot_ensemble_participation_prob_vs_p_group(ax, net, m):
     t_pop_pre = net["population_size"]
     R = net["background_rate"]
     D = net["input_duration"]
+    p_bg = 1 - np.exp(-R * D)
 
-    # True connected group
-    # c = 0.7384796
+    # connectivity-based fully-mixed group
     c = 2.56141683
     p_total_exp_1 = []
     for p_i in p_e:
         egrp_exp_Ei = p * N * Z / L
         p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
         p_total_exp_1.append(1 - np.power((1 - p_grp_exp), c * int(L / Z)))
-    ax.plot(p_e, p_total_exp_1, "-o", c="b", label="true connected", alpha=0.7)
+    ax.plot(p_e, p_total_exp_1, "-o", c="b", label="cFMG", alpha=0.7)
 
-    # True active group
-    # c = 0.74330444
+    # activity-based fully-mixed group
     c = 2.57658637
     p_total_exp_1 = []
     for p_i in p_e:
         egrp_exp_Ei = p * p_i * N * Z / L
         p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
         p_total_exp_1.append(1 - np.power((1 - p_grp_exp), c * int(L / Z)))
-    ax.plot(p_e, p_total_exp_1, ":o", c="b", label="true active", alpha=0.7)
+    ax.plot(p_e, p_total_exp_1, ":o", c="b", label="aFMG", alpha=0.7)
 
-    # Degenerate connected group
-    # c = 0.66733867
+    # connectivity-based stimulus-driven group
     c = 2.62999896
     p_total_exp_1 = []
     for p_i in p_e:
@@ -280,10 +175,9 @@ def plot_ensemble_participation_prob_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / Z)))
-    ax.plot(p_e, p_total_exp_1, "-s", c="c", label="degenerate connected", alpha=0.7)
+    ax.plot(p_e, p_total_exp_1, "-s", c="c", label="cSDG", alpha=0.7)
 
-    # Degenerate active group
-    # c = 0.67088243
+    # activity-based stimulus-driven group
     c = 2.63552124
     p_total_exp_1 = []
     for p_i in p_e:
@@ -292,133 +186,29 @@ def plot_ensemble_participation_prob_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / Z)))
-    ax.plot(p_e, p_total_exp_1, ":s", c="c", label="degenerate active", alpha=0.7)
+    ax.plot(p_e, p_total_exp_1, ":s", c="c", label="aSDG", alpha=0.7)
 
     # Noise group
-    # c = 0.39755312
-    c = 2.30756123
+    c = 2.440585586
     p_total_exp_1 = []
     for p_i in p_e:
         sigma = L / int(p * t_pop_pre)
-        ENoise_exp = R * D * Z * ((1 / sigma) - (p * N * m / L))
+        ENoise_exp = p_bg * Z * ((1 / sigma) - (p * N * m / L))
         p_noise_exp = 1 - np.sum([poisson.pmf(k=j, mu=ENoise_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_noise_exp), c * int(L / Z)))
-    ax.plot(p_e, p_total_exp_1, ":+", c="r", label="noise", alpha=0.7)
+    ax.plot(p_e, p_total_exp_1, ":+", c="r", label="NG", alpha=0.7)
 
     # Any group
-    # c = 0.32892748
-    c = 2.10499296
+    c = 2.208905456
     p_total_exp_1 = []
     for p_i in p_e:
         sigma = L / int(p * t_pop_pre)
-        EAll_exp = R * D * Z * ((1 / sigma) - (p * N * m / L)) + (
+        EAll_exp = p_bg * Z * ((1 / sigma) - (p * N * m / L)) + (
             p * p_i * N * m * Z / L
         )
         p_any_exp = 1 - np.sum([poisson.pmf(k=j, mu=EAll_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_any_exp), c * int(L / Z)))
-    ax.plot(p_e, p_total_exp_1, ":x", c="k", label="any", alpha=0.7)
-
-    # # True connected group
-    # p_total_exp_fit = []
-    # for p_i in p_e:
-    #     sigma = L / int(p * t_pop_pre)
-    #     q = N / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -(m - j) * x - j * y
-    #         A[j + 1, j] = (m - j) * x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p_e, p_total_exp_fit, "-o", c="b", label="true connected")
-    #
-    # # True active group
-    # p_total_exp_fit = []
-    # for p_i in p_e:
-    #     sigma = L / int(p * t_pop_pre)
-    #     q = p_i * N / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -(m - j) * x - j * y
-    #         A[j + 1, j] = (m - j) * x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p_e, p_total_exp_fit, ":o", c="b", label="true active")
-    #
-    # # Degenerate connected group
-    # p_total_exp_fit = []
-    # for p_i in p_e:
-    #     sigma = L / int(p * t_pop_pre)
-    #     q = (m * N) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p_e, p_total_exp_fit, "-s", c="c", label="degenerate connected")
-    #
-    # # Degenerate active group
-    # p_total_exp_fit = []
-    # for p_i in p_e:
-    #     sigma = L / int(p * t_pop_pre)
-    #     q = (p_i * m * N) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p_e, p_total_exp_fit, ":s", c="c", label="degenerate active")
-    #
-    # # Noise group
-    # p_total_exp_fit = []
-    # for p_i in p_e:
-    #     sigma = L / int(p * t_pop_pre)
-    #     q = ((t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p_e, p_total_exp_fit, ":+", c="r", label="noise")
-    #
-    # # Any group
-    # p_total_exp_fit = []
-    # for p_i in p_e:
-    #     sigma = L / int(p * t_pop_pre)
-    #     q = (p_i * m * N + (t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(p_e, p_total_exp_fit, ":x", c="k", label="any")
+    ax.plot(p_e, p_total_exp_1, ":x", c="k", label="AG", alpha=0.7)
 
     sns.despine()
     # ax.set_xscale("log", nonpositive="mask")
@@ -426,7 +216,6 @@ def plot_ensemble_participation_prob_vs_p_group(ax, net, m):
     ax.set_yscale("log", nonpositive="mask")
     ax.set_ylim([1e-6, 1e0])
     ax.set_ylabel("p_group")
-    # ax.legend(frameon=False)
 
 
 def plot_zone_length_vs_p_group(ax, net, m):
@@ -449,29 +238,27 @@ def plot_zone_length_vs_p_group(ax, net, m):
     sigma = L / int(p * t_pop_pre)
     R = net["background_rate"]
     D = net["input_duration"]
+    p_bg = 1 - np.exp(-R * D)
 
-    # True connected group
-    # c = 0.7384796
+    # connectivity-based fully-mixed group
     c = 2.56141683
     p_total_exp_1 = []
     for z in Z:
         egrp_exp_Ei = p * N * z / L
         p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
         p_total_exp_1.append(1 - np.power((1 - p_grp_exp), c * int(L / z)))
-    ax.plot(Z * 1e6, p_total_exp_1, "-o", c="b", label="true connected", alpha=0.7)
+    ax.plot(Z * 1e6, p_total_exp_1, "-o", c="b", label="cFMG", alpha=0.7)
 
-    # True active group
-    # c = 0.74330444
+    # activity-based fully-mixed group
     c = 2.57658637
     p_total_exp_1 = []
     for z in Z:
         egrp_exp_Ei = p * p_e * N * z / L
         p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
         p_total_exp_1.append(1 - np.power((1 - p_grp_exp), c * int(L / z)))
-    ax.plot(Z * 1e6, p_total_exp_1, ":o", c="b", label="true active", alpha=0.7)
+    ax.plot(Z * 1e6, p_total_exp_1, ":o", c="b", label="aFMG", alpha=0.7)
 
-    # Degenerate connected group
-    # c = 0.66733867
+    # connectivity-based stimulus-driven group
     c = 2.62999896
     p_total_exp_1 = []
     for z in Z:
@@ -480,12 +267,9 @@ def plot_zone_length_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / z)))
-    ax.plot(
-        Z * 1e6, p_total_exp_1, "-s", c="c", label="degenerate connected", alpha=0.7
-    )
+    ax.plot(Z * 1e6, p_total_exp_1, "-s", c="c", label="cSDG", alpha=0.7)
 
-    # Degenerate active group
-    # c = 0.67088243
+    # activity-based stimulus-driven group
     c = 2.63552124
     p_total_exp_1 = []
     for z in Z:
@@ -494,134 +278,35 @@ def plot_zone_length_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / z)))
-    ax.plot(Z * 1e6, p_total_exp_1, ":s", c="c", label="degenerate active", alpha=0.7)
+    ax.plot(Z * 1e6, p_total_exp_1, ":s", c="c", label="aSDG", alpha=0.7)
 
     # Noise group
-    # c = 0.39755312
-    c = 2.30756123
+    c = 2.440585586
     p_total_exp_1 = []
     for z in Z:
         sigma = L / int(p * t_pop_pre)
-        ENoise_exp = R * D * z * ((1 / sigma) - (p * N * m / L))
+        ENoise_exp = p_bg * z * ((1 / sigma) - (p * N * m / L))
         p_noise_exp = 1 - np.sum([poisson.pmf(k=j, mu=ENoise_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_noise_exp), c * int(L / z)))
-    ax.plot(Z * 1e6, p_total_exp_1, ":+", c="r", label="noise", alpha=0.7)
+    ax.plot(Z * 1e6, p_total_exp_1, ":+", c="r", label="NG", alpha=0.7)
 
     # Any group
-    # c = 0.32892748
-    c = 2.10499296
+    c = 2.208905456
     p_total_exp_1 = []
     for z in Z:
         sigma = L / int(p * t_pop_pre)
-        EAll_exp = R * D * z * ((1 / sigma) - (p * N * m / L)) + (
+        EAll_exp = p_bg * z * ((1 / sigma) - (p * N * m / L)) + (
             p * p_e * N * m * z / L
         )
         p_any_exp = 1 - np.sum([poisson.pmf(k=j, mu=EAll_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_any_exp), c * int(L / z)))
-    ax.plot(Z * 1e6, p_total_exp_1, ":x", c="k", label="any", alpha=0.7)
-
-    # # True connected group
-    # p_total_exp_fit = []
-    # for z in Z:
-    #     q = N / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -(m - j) * x - j * y
-    #         A[j + 1, j] = (m - j) * x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(Z * 1e6, p_total_exp_fit, "-o", c="b", label="true connected")
-    #
-    # # True active group
-    # p_total_exp_fit = []
-    # for z in Z:
-    #     q = p_e * N / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -(m - j) * x - j * y
-    #         A[j + 1, j] = (m - j) * x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(Z * 1e6, p_total_exp_fit, ":o", c="b", label="true active")
-    #
-    # # Degenerate connected group
-    # p_total_exp_fit = []
-    # for z in Z:
-    #     q = (m * N) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(Z * 1e6, p_total_exp_fit, "-s", c="c", label="degenerate connected")
-    #
-    # # Degenerate active group
-    # p_total_exp_fit = []
-    # for z in Z:
-    #     q = (p_e * m * N) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(Z * 1e6, p_total_exp_fit, ":s", c="c", label="degenerate active")
-    #
-    # # Noise group
-    # p_total_exp_fit = []
-    # for z in Z:
-    #     q = ((t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(Z * 1e6, p_total_exp_fit, ":+", c="r", label="noise")
-    #
-    # # Any group
-    # p_total_exp_fit = []
-    # for z in Z:
-    #     q = (p_e * m * N + (t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(Z * 1e6, p_total_exp_fit, ":x", c="k", label="any")
+    ax.plot(Z * 1e6, p_total_exp_1, ":x", c="k", label="AG", alpha=0.7)
 
     sns.despine()
     ax.set_xlabel("Zone length (\u03bcm)")
     ax.set_yscale("log", nonpositive="mask")
     ax.set_ylim([1e-5, 1e0])
     ax.set_ylabel("p_group")
-    # ax.legend(frameon=False)
 
 
 def plot_ensemble_size_vs_p_group(ax, net, m):
@@ -644,29 +329,27 @@ def plot_ensemble_size_vs_p_group(ax, net, m):
     sigma = L / int(p * t_pop_pre)
     R = net["background_rate"]
     D = net["input_duration"]
+    p_bg = 1 - np.exp(-R * D)
 
-    # True connected group
-    # c = 0.7384796
+    # connectivity-based fully-mixed group
     c = 2.56141683
     p_total_exp_1 = []
     for n in N:
         egrp_exp_Ei = p * n * Z / L
         p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
         p_total_exp_1.append(1 - np.power((1 - p_grp_exp), c * int(L / Z)))
-    ax.plot(N, p_total_exp_1, "-o", c="b", label="true connected", alpha=0.7)
+    ax.plot(N, p_total_exp_1, "-o", c="b", label="cFMG", alpha=0.7)
 
-    # True active group
-    # c = 0.74330444
+    # activity-based fully-mixed group
     c = 2.57658637
     p_total_exp_1 = []
     for n in N:
         egrp_exp_Ei = p * p_e * n * Z / L
         p_grp_exp = np.power(1 - np.exp(-egrp_exp_Ei), m)
         p_total_exp_1.append(1 - np.power((1 - p_grp_exp), c * int(L / Z)))
-    ax.plot(N, p_total_exp_1, ":o", c="b", label="true active", alpha=0.7)
+    ax.plot(N, p_total_exp_1, ":o", c="b", label="aFMG", alpha=0.7)
 
-    # Degenerate connected group
-    # c = 0.66733867
+    # connectivity-based stimulus-driven group
     c = 2.62999896
     p_total_exp_1 = []
     for n in N:
@@ -675,10 +358,9 @@ def plot_ensemble_size_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / Z)))
-    ax.plot(N, p_total_exp_1, "-s", c="c", label="degenerate connected", alpha=0.7)
+    ax.plot(N, p_total_exp_1, "-s", c="c", label="cSDG", alpha=0.7)
 
-    # Degenerate active group
-    # c = 0.67088243
+    # activity-based stimulus-driven group
     c = 2.63552124
     p_total_exp_1 = []
     for n in N:
@@ -687,127 +369,29 @@ def plot_ensemble_size_vs_p_group(ax, net, m):
             [poisson.pmf(k=j, mu=ealt_all_exp_EM) for j in range(0, m)]
         )
         p_total_exp_1.append(1 - np.power((1 - p_alt_exp), c * int(L / Z)))
-    ax.plot(N, p_total_exp_1, ":s", c="c", label="degenerate active", alpha=0.7)
+    ax.plot(N, p_total_exp_1, ":s", c="c", label="aSDG", alpha=0.7)
 
     # Noise group
-    # c = 0.39755312
-    c = 2.30756123
+    c = 2.440585586
     p_total_exp_1 = []
     for n in N:
         sigma = L / int(p * t_pop_pre)
-        ENoise_exp = R * D * Z * ((1 / sigma) - (p * n * m / L))
+        ENoise_exp = p_bg * Z * ((1 / sigma) - (p * n * m / L))
         p_noise_exp = 1 - np.sum([poisson.pmf(k=j, mu=ENoise_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_noise_exp), c * int(L / Z)))
-    ax.plot(N, p_total_exp_1, ":+", c="r", label="noise", alpha=0.7)
+    ax.plot(N, p_total_exp_1, ":+", c="r", label="NG", alpha=0.7)
 
     # Any group
-    # c = 0.32892748
-    c = 2.10499296
+    c = 2.208905456
     p_total_exp_1 = []
     for n in N:
         sigma = L / int(p * t_pop_pre)
-        EAll_exp = R * D * Z * ((1 / sigma) - (p * n * m / L)) + (
+        EAll_exp = p_bg * Z * ((1 / sigma) - (p * n * m / L)) + (
             p * p_e * n * m * Z / L
         )
         p_any_exp = 1 - np.sum([poisson.pmf(k=j, mu=EAll_exp) for j in range(0, m)])
         p_total_exp_1.append(1 - np.power((1 - p_any_exp), c * int(L / Z)))
-    ax.plot(N, p_total_exp_1, ":x", c="k", label="any", alpha=0.7)
-
-    # # True connected group
-    # p_total_exp_fit = []
-    # for n in N:
-    #     q = n / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -(m - j) * x - j * y
-    #         A[j + 1, j] = (m - j) * x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(N, p_total_exp_fit, "-o", c="b", label="true connected")
-    #
-    # # True active group
-    # p_total_exp_fit = []
-    # for n in N:
-    #     q = p_e * n / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -(m - j) * x - j * y
-    #         A[j + 1, j] = (m - j) * x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(N, p_total_exp_fit, ":o", c="b", label="true active")
-    #
-    # # Degenerate connected group
-    # p_total_exp_fit = []
-    # for n in N:
-    #     q = (m * n) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(N, p_total_exp_fit, "-s", c="c", label="degenerate connected")
-    #
-    # # Degenerate active group
-    # p_total_exp_fit = []
-    # for n in N:
-    #     q = (p_e * m * n) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(N, p_total_exp_fit, ":s", c="c", label="degenerate active")
-    #
-    # # Noise group
-    # p_total_exp_fit = []
-    # for n in N:
-    #     q = ((t_pop_pre - m * n) * (1 - np.exp(-R * D))) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(N, p_total_exp_fit, ":+", c="r", label="noise")
-    #
-    # # Any group
-    # p_total_exp_fit = []
-    # for n in N:
-    #     q = (p_e * m * n + (t_pop_pre - m * n) * (1 - np.exp(-R * D))) / t_pop_pre
-    #     x = q * L / sigma
-    #     y = L / Z
-    #     A = np.zeros((m + 1, m + 1))
-    #     for j in range(m):
-    #         A[j, j] = -x - j * y
-    #         A[j + 1, j] = x
-    #     for j in range(m - 1):
-    #         A[j, j + 1] = (j + 1) * y
-    #     B = expm(A)
-    #     p_total_exp_fit.append(B[m, 0])
-    # ax.plot(N, p_total_exp_fit, ":x", c="k", label="any")
+    ax.plot(N, p_total_exp_1, ":x", c="k", label="AG", alpha=0.7)
 
     sns.despine()
     ax.set_xlabel("Ensemble size N")
@@ -815,7 +399,6 @@ def plot_ensemble_size_vs_p_group(ax, net, m):
     ax.set_yscale("log", nonpositive="mask")
     ax.set_ylim([1e-5, 1e0])
     ax.set_ylabel("p_group")
-    # ax.legend(frameon=False)
 
 
 def plot_p_noise_group_vs_noise(ax, net, m):
@@ -837,28 +420,18 @@ def plot_p_noise_group_vs_noise(ax, net, m):
     sigma = L / int(p * t_pop_pre)
     R_values = np.logspace(-3, 1, num=9)
     D_values = np.logspace(-3, 1, num=9)
-    c = 2.30756123
+    c = 2.440585586
 
     # Noise group
     p_total_exp_fit = np.zeros((len(D_values), len(R_values)))
     for d, D in enumerate(D_values):
         for r, R in enumerate(R_values):
-            ENoise_exp = R * D * Z * ((1 / sigma) - (p * N * m / L))
+            p_bg = 1 - np.exp(-R * D)
+            ENoise_exp = p_bg * Z * ((1 / sigma) - (p * N * m / L))
             p_noise_exp = 1 - np.sum(
                 [poisson.pmf(k=j, mu=ENoise_exp) for j in range(0, m)]
             )
             p_total_exp_fit[r, d] = 1 - np.power((1 - p_noise_exp), c * int(L / Z))
-            # q = ((t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-            # x = q * L / sigma
-            # y = L / Z
-            # A = np.zeros((m + 1, m + 1))
-            # for j in range(m):
-            #     A[j, j] = -x - j * y
-            #     A[j + 1, j] = x
-            # for j in range(m - 1):
-            #     A[j, j + 1] = (j + 1) * y
-            # B = expm(A)
-            # p_total_exp_fit[r, d] = B[m, 0]
 
     # Clip values at 1e-6
     p_total_exp_fit = np.clip(p_total_exp_fit, a_min=1e-6, a_max=None)
@@ -920,25 +493,15 @@ def plot_p_any_group_vs_noise(ax, net, m):
 
     # Any group
     p_total_exp_fit = np.zeros((len(D_values), len(R_values)))
-    c = 2.10499296
+    c = 2.208905456
     for d, D in enumerate(D_values):
         for r, R in enumerate(R_values):
-            EAll_exp = R * D * Z * ((1 / sigma) - (p * N * m / L)) + (
+            p_bg = 1 - np.exp(-R * D)
+            EAll_exp = p_bg * Z * ((1 / sigma) - (p * N * m / L)) + (
                 p * p_e * N * m * Z / L
             )
             p_any_exp = 1 - np.sum([poisson.pmf(k=j, mu=EAll_exp) for j in range(0, m)])
             p_total_exp_fit[r, d] = 1 - np.power((1 - p_any_exp), c * int(L / Z))
-            # q = (p_e * m * N + (t_pop_pre - m * N) * (1 - np.exp(-R * D))) / t_pop_pre
-            # x = q * L / sigma
-            # y = L / Z
-            # A = np.zeros((m + 1, m + 1))
-            # for j in range(m):
-            #     A[j, j] = -x - j * y
-            #     A[j + 1, j] = x
-            # for j in range(m - 1):
-            #     A[j, j + 1] = (j + 1) * y
-            # B = expm(A)
-            # p_total_exp_fit[r, d] = B[m, 0]
     ax = sns.heatmap(
         p_total_exp_fit,
         ax=ax,
@@ -997,10 +560,8 @@ def main():
     spec = figure.add_gridspec(3, 8)
     axa = figure.add_subplot(spec[0, 0:4])
     axb = figure.add_subplot(spec[0, 4:8])
-    # axc = figure.add_subplot(spec[0, 6:8])
     axd = figure.add_subplot(spec[1, 0:4])
     axe = figure.add_subplot(spec[1, 4:8])
-    # axf = figure.add_subplot(spec[1, 6:8])
     axg = figure.add_subplot(spec[2, 0:4])
     axh = figure.add_subplot(spec[2, 4:8])
 
@@ -1010,7 +571,6 @@ def main():
     plot_ensemble_size_vs_p_group(axe, networks[4], 5)
     plot_p_noise_group_vs_noise(axg, networks[4], 5)
     plot_p_any_group_vs_noise(axh, networks[4], 5)
-    # plot_legend(axc, axa)
 
     plt.figtext(0.01, 0.98, "A", fontsize=12, weight="bold")
     plt.figtext(0.52, 0.98, "B", fontsize=12, weight="bold")
