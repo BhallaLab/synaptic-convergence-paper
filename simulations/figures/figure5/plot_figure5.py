@@ -12,12 +12,37 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import seaborn as sns
 import pandas as pd
+from scipy.stats import wilcoxon
 
+colors = sns.color_palette("muted", n_colors=7)
 
 sns.set(style="ticks")
 sns.set_context("paper")
 
 DATA_PATH = "../../codes/sequences/chemical/data/"
+
+
+def convert_pvalue_to_stars(pvalue):
+    """Convert pvalue to significance stars
+
+    Parameters
+    ----------
+    pvalue : float
+        p value obtained from the statistical tests
+
+    Returns
+    -------
+        The right symbol for indicating the level of significance
+    """
+    if pvalue <= 0.0001:
+        return "****"
+    elif pvalue <= 0.001:
+        return "***"
+    elif pvalue <= 0.01:
+        return "**"
+    elif pvalue <= 0.05:
+        return "*"
+    return "ns"
 
 
 def plot_panel_a(ax):
@@ -61,18 +86,55 @@ def plot_panel_b(ax):
         scrambled_response.iloc[0][start_ind:end_ind],
         label="scrambled",
     )
-    ax.legend(frameon=False)
+    ax.legend(frameon=False, loc="upper left")
     ax.set_xlabel("Position (\u03bcm)")
     ax.set_ylabel("A (a.u.)")
     sns.despine()
 
 
 def plot_panel_c(ax):
+    """Plot responses to different stimulus patterns as a function of the directionality of stimulus
+
+    Parameters
+    ----------
+    ax : axis object
+    """
+    data = np.load(
+        DATA_PATH + "responses_to_stim_patterns.npy",
+        allow_pickle=True,
+    ).item()
+    ax.scatter(data["Q_score"][1:-1], data["A_total"][1:-1], label="other patterns")
+    ax.scatter(
+        data["Q_score"][0],
+        data["A_total"][0],
+        marker="x",
+        color="r",
+        label="ordered sequence",
+    )
+    ax.scatter(
+        data["Q_score"][-1],
+        data["A_total"][-1],
+        marker="^",
+        color="r",
+        label="reverse sequence",
+    )
+    p = np.poly1d(np.polyfit(data["Q_score"], data["A_total"], 6))
+    x_points = np.linspace(-1, 1, 30)
+    ax.plot(x_points, p(x_points), color="k", ls="--")
+    ax.set_xlabel("Directionality (Q score)")
+    ax.set_ylabel("A total (a.u.)")
+    ax.set_xlim([-1.05, 1.05])
+    ax.set_ylim(ymin=0)
+    ax.legend(frameon=False)
+    sns.despine()
+
+
+def plot_panel_d(ax):
     ax.imshow(mpimg.imread("ectopic_inputs.png"))
     ax.axis("off")
 
 
-def plot_panel_d(ax):
+def plot_panel_e(ax):
     """Plot selectivity in the absence and presence of ectopic inputs
 
     Parameters
@@ -94,7 +156,7 @@ def plot_panel_d(ax):
     sns.despine()
 
 
-def plot_panel_e(ax):
+def plot_panel_f(ax):
     """Plot selectivity in the absence of ectopic inputs, and in the presence of 1 or 2 ectopic inputs
 
     Parameters
@@ -105,44 +167,110 @@ def plot_panel_e(ax):
         DATA_PATH + "seq_lengths_selectivity.npy",
         allow_pickle=True,
     ).item()
-    ax.plot(data["1_ectopic"].keys(), data["reference"], color="k", label="reference")
+    mean_1_ectopic = [np.mean(data["1_ectopic"][i]) for i in data["1_ectopic"].keys()]
+    std_1_ectopic = [np.std(data["1_ectopic"][i]) for i in data["1_ectopic"].keys()]
+    mean_2_ectopic = [np.mean(data["2_ectopic"][i]) for i in data["2_ectopic"].keys()]
+    std_2_ectopic = [np.std(data["2_ectopic"][i]) for i in data["2_ectopic"].keys()]
+
     ax.plot(
         data["1_ectopic"].keys(),
-        [np.mean(data["1_ectopic"][i]) for i in data["1_ectopic"].keys()],
+        data["reference"],
+        color="k",
+        label="reference",
+        marker="o",
+    )
+    ax.plot(
+        data["1_ectopic"].keys(),
+        mean_1_ectopic,
         "-",
         label="1_ectopic",
+        color=colors[-1],
+        marker="o",
+    )
+    ax.errorbar(
+        data["1_ectopic"].keys(),
+        mean_1_ectopic,
+        yerr=std_1_ectopic,
+        fmt="o",
+        color=colors[-1],
     )
     ax.plot(
         data["2_ectopic"].keys(),
-        [np.mean(data["2_ectopic"][i]) for i in data["2_ectopic"].keys()],
+        mean_2_ectopic,
         "-",
         label="2_ectopic",
+        color=colors[-3],
+        marker="o",
     )
+    ax.errorbar(
+        data["2_ectopic"].keys(),
+        mean_2_ectopic,
+        yerr=std_2_ectopic,
+        fmt="o",
+        color=colors[-3],
+    )
+
+    print("1 ectopic p-values")
+    for i, j in enumerate(data["1_ectopic"].keys()):
+        res = wilcoxon(
+            np.array(data["1_ectopic"][j]) - data["reference"][i], alternative="less"
+        )
+        print(j, res.pvalue)
+        ax.text(
+            x=j,
+            y=1,
+            s=convert_pvalue_to_stars(res.pvalue),
+            va="center",
+            ha="center",
+            fontsize=10,
+            color=colors[-1],
+        )
+    print()
+    print("2 ectopic p-values")
+    for i, j in enumerate(data["2_ectopic"].keys()):
+        res = wilcoxon(
+            np.array(data["2_ectopic"][j]) - data["reference"][i], alternative="less"
+        )
+        print(j, res.pvalue)
+        ax.text(
+            x=j,
+            y=0.95,
+            s=convert_pvalue_to_stars(res.pvalue),
+            va="center",
+            ha="center",
+            fontsize=10,
+            color=colors[-3],
+        )
     ax.legend(frameon=False)
     ax.set_xlabel("Sequence Length")
     ax.set_ylabel("Selectivity")
+    ax.set_ylim(ymax=1.0)
     sns.despine()
 
 
 def main():
-    figure = plt.figure(figsize=(7, 7), constrained_layout=True)
-    spec = figure.add_gridspec(5, 8)
+    figure = plt.figure(figsize=(9, 8), constrained_layout=True)
+    spec = figure.add_gridspec(6, 9)
     axa = figure.add_subplot(spec[0:2, 0:3])
-    axb = figure.add_subplot(spec[0:2, 3:8])
-    axc = figure.add_subplot(spec[2:3, 0:8])
-    axd = figure.add_subplot(spec[3:5, 0:4])
-    axe = figure.add_subplot(spec[3:5, 4:8])
+    axb = figure.add_subplot(spec[0:2, 3:6])
+    axc = figure.add_subplot(spec[0:2, 6:9])
+    axd = figure.add_subplot(spec[2:4, 0:9])
+    axe = figure.add_subplot(spec[4:6, 0:4])
+    axf = figure.add_subplot(spec[4:6, 5:9])
+
     plot_panel_a(axa)
     plot_panel_b(axb)
     plot_panel_c(axc)
     plot_panel_d(axd)
     plot_panel_e(axe)
+    plot_panel_f(axf)
 
     plt.figtext(0.02, 0.98, "A", fontsize=16, weight="bold")
-    plt.figtext(0.36, 0.98, "B", fontsize=16, weight="bold")
-    plt.figtext(0.15, 0.55, "C", fontsize=16, weight="bold")
-    plt.figtext(0.02, 0.38, "D", fontsize=16, weight="bold")
-    plt.figtext(0.52, 0.38, "E", fontsize=16, weight="bold")
+    plt.figtext(0.35, 0.98, "B", fontsize=16, weight="bold")
+    plt.figtext(0.66, 0.98, "C", fontsize=16, weight="bold")
+    plt.figtext(0.05, 0.55, "D", fontsize=16, weight="bold")
+    plt.figtext(0.02, 0.35, "E", fontsize=16, weight="bold")
+    plt.figtext(0.55, 0.35, "F", fontsize=16, weight="bold")
 
     plt.savefig("Figure-5.png", bbox_inches="tight")
     plt.savefig("Figure-5.svg", bbox_inches="tight")
