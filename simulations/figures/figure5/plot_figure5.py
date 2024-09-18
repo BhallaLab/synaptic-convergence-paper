@@ -14,8 +14,6 @@ import seaborn as sns
 import pandas as pd
 from scipy.stats import wilcoxon
 
-colors = sns.color_palette("muted", n_colors=7)
-
 sns.set(style="ticks")
 sns.set_context("paper")
 
@@ -103,24 +101,29 @@ def plot_panel_c(ax):
         DATA_PATH + "responses_to_stim_patterns.npy",
         allow_pickle=True,
     ).item()
-    ax.scatter(data["Q_score"][1:-1], data["A_total"][1:-1], label="other patterns")
+    ax.scatter(
+        data["Q_score"][1:-1],
+        data["A_total"][1:-1],
+        label="other patterns",
+        color="C1",
+    )
     ax.scatter(
         data["Q_score"][0],
         data["A_total"][0],
         marker="x",
-        color="r",
+        color="C0",
         label="ordered sequence",
     )
     ax.scatter(
         data["Q_score"][-1],
         data["A_total"][-1],
         marker="^",
-        color="r",
+        color="C0",
         label="reverse sequence",
     )
     p = np.poly1d(np.polyfit(data["Q_score"], data["A_total"], 6))
     x_points = np.linspace(-1, 1, 30)
-    ax.plot(x_points, p(x_points), color="k", ls="--")
+    ax.plot(x_points, p(x_points), color="k", ls="--", label="polynomial fit")
     ax.set_xlabel("Directionality (Q score)")
     ax.set_ylabel("A total (a.u.)")
     ax.set_xlim([-1.05, 1.05])
@@ -177,37 +180,36 @@ def plot_panel_f(ax):
         data["reference"],
         color="k",
         label="reference",
-        marker="o",
     )
     ax.plot(
         data["1_ectopic"].keys(),
         mean_1_ectopic,
         "-",
         label="1_ectopic",
-        color=colors[-1],
-        marker="o",
+        color="C3",
     )
     ax.errorbar(
         data["1_ectopic"].keys(),
         mean_1_ectopic,
         yerr=std_1_ectopic,
         fmt="o",
-        color=colors[-1],
+        color="C3",
+        alpha=0.6,
     )
     ax.plot(
         data["2_ectopic"].keys(),
         mean_2_ectopic,
         "-",
         label="2_ectopic",
-        color=colors[-3],
-        marker="o",
+        color="C4",
     )
     ax.errorbar(
         data["2_ectopic"].keys(),
         mean_2_ectopic,
         yerr=std_2_ectopic,
         fmt="o",
-        color=colors[-3],
+        color="C4",
+        alpha=0.6,
     )
 
     print("1 ectopic p-values")
@@ -223,7 +225,7 @@ def plot_panel_f(ax):
             va="center",
             ha="center",
             fontsize=10,
-            color=colors[-1],
+            color="C3",
         )
     print()
     print("2 ectopic p-values")
@@ -239,7 +241,7 @@ def plot_panel_f(ax):
             va="center",
             ha="center",
             fontsize=10,
-            color=colors[-3],
+            color="C4",
         )
     ax.legend(frameon=False)
     ax.set_xlabel("Sequence Length")
