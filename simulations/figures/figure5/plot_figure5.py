@@ -217,7 +217,7 @@ def plot_panel_f(ax):
         res = wilcoxon(
             np.array(data["1_ectopic"][j]) - data["reference"][i], alternative="less"
         )
-        print(j, res.pvalue)
+        print(j, round(res.pvalue, 3))
         ax.text(
             x=j,
             y=1,
@@ -233,7 +233,7 @@ def plot_panel_f(ax):
         res = wilcoxon(
             np.array(data["2_ectopic"][j]) - data["reference"][i], alternative="less"
         )
-        print(j, res.pvalue)
+        print(j, round(res.pvalue, 3))
         ax.text(
             x=j,
             y=0.95,
