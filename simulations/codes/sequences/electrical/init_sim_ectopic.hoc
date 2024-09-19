@@ -119,7 +119,7 @@ for net=0, nEctTime-1 {
 objref savv, savm
 //savv = new File()
 savm = new File()
-//savv.wopen("./tempV_panelE.dat")
+//savv.wopen("./tempV_5_panelE.dat")
 savm.wopen("./tempM_5_panelE.dat")
 //storev.fprint(0, savv, "%f ")
 storeMes.fprint(0, savm, "%f ")  

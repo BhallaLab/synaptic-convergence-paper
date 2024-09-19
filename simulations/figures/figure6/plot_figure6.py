@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 import seaborn as sns
 import pandas as pd
+from scipy.stats import wilcoxon
 
 sys.path.append("../../codes/sequences/")
 import sequence_params as prm
@@ -23,6 +24,29 @@ DATA_PATH = "../../codes/sequences/electrical/"
 
 MIN_M = prm.MIN_M
 MAX_M = prm.MAX_M
+
+
+def convert_pvalue_to_stars(pvalue):
+    """Convert pvalue to significance stars
+
+    Parameters
+    ----------
+    pvalue : float
+        p value obtained from the statistical tests
+
+    Returns
+    -------
+        The right symbol for indicating the level of significance
+    """
+    if pvalue <= 0.0001:
+        return "****"
+    elif pvalue <= 0.001:
+        return "***"
+    elif pvalue <= 0.01:
+        return "**"
+    elif pvalue <= 0.05:
+        return "*"
+    return "ns"
 
 
 def plotPanelA(ax):
@@ -44,7 +68,7 @@ def plotPanelB(ax):
     ax : axis object
     """
     responses = pd.read_csv(
-        DATA_PATH + "tempV.dat",
+        DATA_PATH + "tempV_5_panelC.dat",
         header=None,
         sep=" ",
     )
@@ -215,7 +239,8 @@ def plotPanelE(ax):
     selectivity = {}
     selectivity["reference"] = []
     selectivity["1_ectopic"] = []
-    for M in range(MIN_M, MAX_M + 1):
+    std_selectivity_1_ectopic = []
+    for i, M in enumerate(range(MIN_M, MAX_M + 1)):
         responses = pd.read_csv(
             DATA_PATH + f"tempM_{M}_panelE.dat",
             header=None,
@@ -242,18 +267,53 @@ def plotPanelE(ax):
         for ect_type in ["reference", "1_ectopic"]:
             if ect_type == "reference":
                 data = responses[responses["ect_time"] > 1000]
+                seq_response = np.mean(data.loc[data["seq_id"] == 0, "vmax"])
+                mean_response = np.mean(data["vmax"])
+                max_response = np.max(data["vmax"])
+                selectivity[ect_type].append(
+                    (seq_response - mean_response) / max_response
+                )
             else:
                 data = responses[responses["ect_time"] < 1000]
+                sel_group = []
+                for ect_time, time_group in data.groupby("ect_time"):
+                    for ect_pos, pos_group in time_group.groupby("ect_pos"):
+                        sorted_group = pos_group.sort_values(by=["seq_id"])
+                        sel = (
+                            sorted_group.iloc[0]["vmax"]
+                            - np.mean(sorted_group.iloc[:]["vmax"])
+                        ) / np.max(sorted_group.iloc[:]["vmax"])
+                        sel_group.append(sel)
+                selectivity[ect_type].append(np.mean(sel_group))
+                std_selectivity_1_ectopic.append(np.std(sel_group))
+                res = wilcoxon(
+                    np.array(sel_group) - selectivity["reference"][i],
+                    alternative="less",
+                )
+                print(M, round(res.pvalue, 3))
+                ax.text(
+                    x=M,
+                    y=0.1,
+                    s=convert_pvalue_to_stars(res.pvalue),
+                    va="center",
+                    ha="center",
+                    fontsize=10,
+                    color="C3",
+                )
 
-            seq_response = np.mean(data.loc[data["seq_id"] == 0, "vmax"])
-            mean_response = np.mean(data["vmax"])
-            max_response = np.max(data["vmax"])
-            selectivity[ect_type].append((seq_response - mean_response) / max_response)
     ax.plot(
         range(MIN_M, MAX_M + 1), selectivity["reference"], color="k", label="reference"
     )
     ax.plot(
-        range(MIN_M, MAX_M + 1), selectivity["1_ectopic"], color="r", label="1_ectopic"
+        range(MIN_M, MAX_M + 1), selectivity["1_ectopic"], color="C3", label="1_ectopic"
+    )
+    ax.errorbar(
+        range(MIN_M, MAX_M + 1),
+        selectivity["1_ectopic"],
+        yerr=std_selectivity_1_ectopic,
+        color="r",
+        fmt="o",
+        alpha=0.5,
     )
     ax.legend(frameon=False)
     ax.set_xlabel("Sequence length")
@@ -278,7 +338,7 @@ def main():
 
     plt.figtext(0.01, 0.98, "A", fontsize=16, weight="bold")
     plt.figtext(0.51, 0.98, "B", fontsize=16, weight="bold")
-    plt.figtext(0.51, 0.65, "C", fontsize=16, weight="bold")
+    plt.figtext(0.51, 0.67, "C", fontsize=16, weight="bold")
     plt.figtext(0.01, 0.33, "D", fontsize=16, weight="bold")
     plt.figtext(0.51, 0.33, "E", fontsize=16, weight="bold")
 
