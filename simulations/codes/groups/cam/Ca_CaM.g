@@ -1,7 +1,7 @@
 //genesis
 // kkit Version 11 flat dumpfile
  
-// Saved on Mon Nov  2 11:19:37 2020
+// Saved on Thu Sep 19 13:57:35 2024
  
 include kkit {argv 1}
  
@@ -66,53 +66,53 @@ simundump group /kinetics/CaM 0 blue green x 0 0 "" defaultfile defaultfile.g \
 simundump text /kinetics/CaM/notes 0 ""
 call /kinetics/CaM/notes LOAD \
 ""
-simundump kpool /kinetics/CaM/CaM_Ca4 1 0e-12 0 0 0 0 0 0 600 0 \
+simundump kpool /kinetics/CaM/CaM_Ca4 1 2e-11 0 0 0 0 0 0 600 0 \
   /kinetics/geometry blue 10 2551 5857 0
 simundump text /kinetics/CaM/CaM_Ca4/notes 0 ""
 call /kinetics/CaM/CaM_Ca4/notes LOAD \
 ""
-simundump kpool /kinetics/CaM/CaM 1 0e-13 2 2 1200 1200 0 0 600 0 \
+simundump kpool /kinetics/CaM/CaM 1 2e-11 2 2 1200 1200 0 0 600 0 \
   /kinetics/geometry pink 10 2182 5857 0
 simundump text /kinetics/CaM/CaM/notes 0 \
   "There is a LOT of this in the cell: upto 1% of total protein mass. (Alberts et al) Say 25 uM. Meyer et al Science 256 1199-1202 1992 refer to studies saying it is comparable to CaMK levels."
 call /kinetics/CaM/CaM/notes LOAD \
 "There is a LOT of this in the cell: upto 1% of total protein mass. (Alberts et al) Say 25 uM. Meyer et al Science 256 1199-1202 1992 refer to studies saying it is comparable to CaMK levels."
-simundump kpool /kinetics/CaM/CaM_Ca3 1 0e-12 0 0 0 0 0 0 600 0 \
+simundump kpool /kinetics/CaM/CaM_Ca3 1 2e-11 0 0 0 0 0 0 600 0 \
   /kinetics/geometry hotpink 10 3280 5857 0
 simundump text /kinetics/CaM/CaM_Ca3/notes 0 ""
 call /kinetics/CaM/CaM_Ca3/notes LOAD \
 ""
-simundump kpool /kinetics/CaM/CaM_Ca2 1 0e-12 0 0 0 0 0 0 600 0 \
+simundump kpool /kinetics/CaM/CaM_Ca2 1 2e-11 0 0 0 0 0 0 600 0 \
   /kinetics/geometry pink 10 2471 7014 0
 simundump text /kinetics/CaM/CaM_Ca2/notes 0 \
   "This is the intermediate where the TR2 end (the high-affinity end) has bound the Ca but the TR1 end has not."
 call /kinetics/CaM/CaM_Ca2/notes LOAD \
 "This is the intermediate where the TR2 end (the high-affinity end) has bound the Ca but the TR1 end has not."
-simundump kpool /kinetics/CaM/CaM_Ca 1 0e-12 0 0 0 0 0 0 600 0 \
+simundump kpool /kinetics/CaM/CaM_Ca 1 2e-11 0 0 0 0 0 0 600 0 \
   /kinetics/geometry pink 10 3201 7014 0
 simundump text /kinetics/CaM/CaM_Ca/notes 0 \
   "This is the intermediate where the TR2 end (the high-affinity end) has bound the Ca but the TR1 end has not."
 call /kinetics/CaM/CaM_Ca/notes LOAD \
 "This is the intermediate where the TR2 end (the high-affinity end) has bound the Ca but the TR1 end has not."
-simundump kreac /kinetics/CaM/CaM_Ca3_bind_Ca 0 0.0071653 10 "" white 10 3004 \
+simundump kreac /kinetics/CaM/CaM_Ca3_bind_Ca 0 0.003 10 "" white 10 3004 \
   6478 0
 simundump text /kinetics/CaM/CaM_Ca3_bind_Ca/notes 0 \
   "Use K3 = 21.5 uM here from Stemmer and Klee table 3. kb/kf =21.5 * 6e5 so kf = 7.75e-7, kb = 10"
 call /kinetics/CaM/CaM_Ca3_bind_Ca/notes LOAD \
 "Use K3 = 21.5 uM here from Stemmer and Klee table 3. kb/kf =21.5 * 6e5 so kf = 7.75e-7, kb = 10"
-simundump kreac /kinetics/CaM/CaM_bind_Ca 0 0.012159 8.4853 "" white 10 3333 \
+simundump kreac /kinetics/CaM/CaM_bind_Ca 0 0.014141 8.4853 "" white 10 3333 \
   6473 0
 simundump text /kinetics/CaM/CaM_bind_Ca/notes 0 \
   "Lets use the fast rate consts here. Since the rates are so different, I am not sure whether the order is relevant. These correspond to the TR2C fragment. We use the Martin et al rates here, plus the Drabicowski binding consts. All are scaled by 3X to cell temp. kf = 2e-10 kb = 72 Stemmer & Klee: K1=.9, K2=1.1. Assume 1.0uM for both. kb/kf=3.6e11. If kb=72, kf = 2e-10 (Exactly the same !)...."
 call /kinetics/CaM/CaM_bind_Ca/notes LOAD \
 "Lets use the fast rate consts here. Since the rates are so different, I am not sure whether the order is relevant. These correspond to the TR2C fragment. We use the Martin et al rates here, plus the Drabicowski binding consts. All are scaled by 3X to cell temp. kf = 2e-10 kb = 72 Stemmer & Klee: K1=.9, K2=1.1. Assume 1.0uM for both. kb/kf=3.6e11. If kb=72, kf = 2e-10 (Exactly the same !) 19 May 2006. Splitting the old CaM-TR2-bind-Ca reaction into two steps, each binding 1 Ca. This improves numerical stability and is conceptually better too. Overall rates are the same, so each kf and kb is the square root of the earlier ones. So kf = 1.125e-4, kb = 8.4853"
-simundump kreac /kinetics/CaM/CaM_Ca2_bind_Ca 0 0.0071653 10 "" white 10 3667 \
+simundump kreac /kinetics/CaM/CaM_Ca2_bind_Ca 0 0.006 10 "" white 10 3667 \
   6473 0
 simundump text /kinetics/CaM/CaM_Ca2_bind_Ca/notes 0 \
   "K3 = 21.5, K4 = 2.8. Assuming that the K4 step happens first, we get kb/kf = 2.8 uM = 1.68e6 so kf =6e-6 assuming kb = 10"
 call /kinetics/CaM/CaM_Ca2_bind_Ca/notes LOAD \
 "K3 = 21.5, K4 = 2.8. Assuming that the K4 step happens first, we get kb/kf = 2.8 uM = 1.68e6 so kf =6e-6 assuming kb = 10"
-simundump kreac /kinetics/CaM/CaM_Ca_bind_Ca 0 0.012159 8.4853 "" white 10 \
+simundump kreac /kinetics/CaM/CaM_Ca_bind_Ca 0 0.014141 8.4853 "" white 10 \
   4000 6455 0
 simundump text /kinetics/CaM/CaM_Ca_bind_Ca/notes 0 \
   "Lets use the fast rate consts here. Since the rates are so different, I am not sure whether the order is relevant. These correspond to the TR2C fragment. We use the Martin et al rates here, plus the Drabicowski binding consts. All are scaled by 3X to cell temp. kf = 2e-10 kb = 72 Stemmer & Klee: K1=.9, K2=1.1. Assume 1.0uM for both. kb/kf=3.6e11. If kb=72, kf = 2e-10 (Exactly the same !)...."
@@ -142,7 +142,8 @@ simundump kpool /kinetics/Ca/Ca_ext 0 0 0.08 0.08 48 48 0 0 600 4 \
 simundump text /kinetics/Ca/Ca_ext/notes 0 ""
 call /kinetics/Ca/Ca_ext/notes LOAD \
 ""
-simundump kreac /kinetics/Ca/Ca_homeostasis 0 0.5 0.5 "" white black 3317 7644 0
+simundump kreac /kinetics/Ca/Ca_homeostasis 0 0.5 0.5 "" white black 3317 \
+  7644 0
 simundump text /kinetics/Ca/Ca_homeostasis/notes 0 ""
 call /kinetics/Ca/Ca_homeostasis/notes LOAD \
 ""
@@ -154,7 +155,7 @@ simundump xplot /graphs/conc1/CaM_Ca4.Co 3 524288 \
   "delete_plot.w <s> <d>; edit_plot.D <w>" blue 0 0 1
 simundump xgraph /moregraphs/conc3 0 0 100 0 1 0
 simundump xgraph /moregraphs/conc4 0 0 100 0 1 0
-simundump xcoredraw /edit/draw 0 -2 4002 1583 9508
+simundump xcoredraw /edit/draw 0 25 25 25 25
 simundump xtree /edit/draw/tree 0 \
   /kinetics/#[],/kinetics/#[]/#[],/kinetics/#[]/#[]/#[][TYPE!=proto],/kinetics/#[]/#[]/#[][TYPE!=linkinfo]/##[] \
   "edit_elm.D <v>; drag_from_edit.w <d> <S> <x> <y> <z>" auto 0.6
