@@ -1,0 +1,221 @@
+
+Concentration units: uM
+Time units: sec
+Default Volume (m^3) : 1e-20
+
+
+
+Data for group /kinetics
+
+-------------------------------------------
+
+
+Data for group /kinetics/PSD
+Reactions for group /kinetics/PSD
+name kf kb Kf Kb Kd tau sub_order prd_order
+Ca_stim 500 10 500 10 50 0.0019608 0 0
+
+Pools for group /kinetics/PSD
+name	InitialConc	buffered	Volume
+Ca	0.1 uM	0	0.01 fl
+Ca_input	0.08 uM	1	0.01 fl
+
+
+-------------------------------------------
+
+
+Data for group /kinetics/PSD/CaM
+Reactions for group /kinetics/PSD/CaM
+name kf kb Kf Kb Kd tau sub_order prd_order
+CaM-Ca3-bind-Ca 0.3 10 1.8 10 5.5556 0.097087 1 0
+CaM-bind-Ca 1.4141 8.4853 8.4846 8.4853 1.0001 0.10102 1 0
+CaM-Ca2-bind-Ca 0.60001 10 3.6001 10 2.7777 0.09434 1 0
+CaM-Ca-bind-Ca 1.4141 8.4853 8.4846 8.4853 1.0001 0.10102 1 0
+
+Pools for group /kinetics/PSD/CaM
+name	InitialConc	buffered	Volume
+CaM	40 uM	0	0.01 fl
+CaM-Ca3	0 uM	0	0.01 fl
+CaM-Ca2	0 uM	0	0.01 fl
+CaM-Ca	0 uM	0	0.01 fl
+CaM-Ca4	0 uM	0	0.01 fl
+
+
+-------------------------------------------
+
+
+Data for group /kinetics/DEND
+Reactions for group /kinetics/DEND
+name kf kb Kf Kb Kd tau sub_order prd_order
+degrade_Y 0.4 0.01 0.4 0.01 40 2.439 0 0
+Ca_activate_Raf 3.3333e-05 4 12 4 0.57735 0.25 2 0
+dephosph 6 0 6 0 inf 0.16667 0 0
+activate_PKC 2.7779e-06 2 1 2 1.4142 0.5 2 0
+Ca_stim 500 10 500 10 50 0.0019608 0 0
+basal_phosphatase 0.03 0 0.03 0 inf 33.333 0 0
+
+Enzymes for group /kinetics/DEND
+name k1 k2 k3 Km Vmax nsub
+phosphatase/P 0.41667 4 1 0.02 1 1
+P_MAPK/PLA2 0.016667 40 10 5 10 1
+P_MAPK/activate_phosphatase 0.00083335 0.4 0.1 1 0.1 1
+P_MAPK/phosph_chan 0.083335 200 50 5 50 1
+act_PKC/MAPKK 0.016667 40 10 5 10 1
+act_Raf/MAPKKK 0.0041665 40 10 20.001 10 1
+reg_phosphatase/P 0.16667 8 2 0.099998 2 1
+
+Pools for group /kinetics/DEND
+name	InitialConc	buffered	Volume
+phosphatase	0.4 uM	0	1 fl
+P_MAPK	0 uM	0	0.99998 fl
+MAPK	2 uM	0	0.99998 fl
+AA	0 uM	0	0.99998 fl
+act_PKC	0 uM	0	0.99998 fl
+PKC	1 uM	0	0.99998 fl
+APC	1 uM	1	0.99998 fl
+Raf	1.4 uM	0	1 fl
+act_Raf	0 uM	0	1 fl
+Ca	0.08 uM	0	1 fl
+Ca_input	0.08 uM	1	1 fl
+inact_phosphatase	1 uM	0	1 fl
+reg_phosphatase	0 uM	0	1 fl
+channel	1 uM	0	1 fl
+channel_p	0 uM	0	1 fl
+
+
+-------------------------------------------
+
+
+Data for group /kinetics/DEND/CaM
+Reactions for group /kinetics/DEND/CaM
+name kf kb Kf Kb Kd tau sub_order prd_order
+CaM-Ca3-bind-Ca 0.003 10 1.8 10 5.5556 0.09997 1 0
+CaM-bind-Ca 0.014141 8.4853 8.4846 8.4853 1.0001 0.11765 1 0
+CaM-Ca2-bind-Ca 0.006 10 3.6 10 2.7778 0.09994 1 0
+CaM-Ca-bind-Ca 0.014141 8.4853 8.4846 8.4853 1.0001 0.11765 1 0
+CaM_x2 10 10 10 10 1 0.05 0 0
+
+Pools for group /kinetics/DEND/CaM
+name	InitialConc	buffered	Volume
+CaM	2 uM	0	1 fl
+CaM-Ca3	0 uM	0	1 fl
+CaM-Ca2	0 uM	0	1 fl
+CaM-Ca	0 uM	0	1 fl
+CaM-Ca4	0 uM	0	1 fl
+CaM_xchange	0 uM	0	1 fl
+
+
+-------------------------------------------
+
+
+Data for group /kinetics/SPINE
+Pools for group /kinetics/SPINE
+name	InitialConc	buffered	Volume
+Ca	0.11111 uM	0	0.09 fl
+
+
+-------------------------------------------
+
+
+Data for group /kinetics/SPINE/CaM
+Reactions for group /kinetics/SPINE/CaM
+name kf kb Kf Kb Kd tau sub_order prd_order
+CaM-Ca3-bind-Ca 0.033333 10 1.8 10 5.5556 0.099668 1 0
+CaM-bind-Ca 0.15712 8.4853 8.4845 8.4853 1.0001 0.11571 1 0
+CaM-Ca2-bind-Ca 0.066668 10 3.6001 10 2.7777 0.099338 1 0
+CaM-Ca-bind-Ca 0.15712 8.4853 8.4845 8.4853 1.0001 0.11571 1 0
+CaM_x2 1 100 1 100 0.01 0.009901 0 0
+
+Pools for group /kinetics/SPINE/CaM
+name	InitialConc	buffered	Volume
+CaM	40 uM	0	0.09 fl
+CaM-Ca3	0 uM	0	0.09 fl
+CaM-Ca2	0 uM	0	0.09 fl
+CaM-Ca	0 uM	0	0.09 fl
+CaM-Ca4	0 uM	0	0.09 fl
+CaM_xchange	0 uM	0	0.09 fl
+
+
+-------------------------------------------
+-------------------------------------------
+-------------------------------------------
+
+Same data, sorting by data type:
+
+
+
+Data for group /##[]
+Reactions for group /##[]
+name kf kb Kf Kb Kd tau sub_order prd_order
+Ca_stim 500 10 500 10 50 0.0019608 0 0
+CaM-Ca3-bind-Ca 0.3 10 1.8 10 5.5556 0.097087 1 0
+CaM-bind-Ca 1.4141 8.4853 8.4846 8.4853 1.0001 0.10102 1 0
+CaM-Ca2-bind-Ca 0.60001 10 3.6001 10 2.7777 0.09434 1 0
+CaM-Ca-bind-Ca 1.4141 8.4853 8.4846 8.4853 1.0001 0.10102 1 0
+degrade_Y 0.4 0.01 0.4 0.01 40 2.439 0 0
+Ca_activate_Raf 3.3333e-05 4 12 4 0.57735 0.25 2 0
+dephosph 6 0 6 0 inf 0.16667 0 0
+activate_PKC 2.7779e-06 2 1 2 1.4142 0.5 2 0
+Ca_stim 500 10 500 10 50 0.0019608 0 0
+basal_phosphatase 0.03 0 0.03 0 inf 33.333 0 0
+CaM-Ca3-bind-Ca 0.003 10 1.8 10 5.5556 0.09997 1 0
+CaM-bind-Ca 0.014141 8.4853 8.4846 8.4853 1.0001 0.11765 1 0
+CaM-Ca2-bind-Ca 0.006 10 3.6 10 2.7778 0.09994 1 0
+CaM-Ca-bind-Ca 0.014141 8.4853 8.4846 8.4853 1.0001 0.11765 1 0
+CaM_x2 10 10 10 10 1 0.05 0 0
+CaM-Ca3-bind-Ca 0.033333 10 1.8 10 5.5556 0.099668 1 0
+CaM-bind-Ca 0.15712 8.4853 8.4845 8.4853 1.0001 0.11571 1 0
+CaM-Ca2-bind-Ca 0.066668 10 3.6001 10 2.7777 0.099338 1 0
+CaM-Ca-bind-Ca 0.15712 8.4853 8.4845 8.4853 1.0001 0.11571 1 0
+CaM_x2 1 100 1 100 0.01 0.009901 0 0
+
+Enzymes for group /##[]
+name k1 k2 k3 Km Vmax nsub
+phosphatase/P 0.41667 4 1 0.02 1 1
+P_MAPK/PLA2 0.016667 40 10 5 10 1
+P_MAPK/activate_phosphatase 0.00083335 0.4 0.1 1 0.1 1
+P_MAPK/phosph_chan 0.083335 200 50 5 50 1
+act_PKC/MAPKK 0.016667 40 10 5 10 1
+act_Raf/MAPKKK 0.0041665 40 10 20.001 10 1
+reg_phosphatase/P 0.16667 8 2 0.099998 2 1
+
+Pools for group /##[]
+name	InitialConc	buffered	Volume
+Ca	0.1 uM	0	0.01 fl
+Ca_input	0.08 uM	1	0.01 fl
+CaM	40 uM	0	0.01 fl
+CaM-Ca3	0 uM	0	0.01 fl
+CaM-Ca2	0 uM	0	0.01 fl
+CaM-Ca	0 uM	0	0.01 fl
+CaM-Ca4	0 uM	0	0.01 fl
+phosphatase	0.4 uM	0	1 fl
+P_MAPK	0 uM	0	0.99998 fl
+MAPK	2 uM	0	0.99998 fl
+AA	0 uM	0	0.99998 fl
+act_PKC	0 uM	0	0.99998 fl
+PKC	1 uM	0	0.99998 fl
+APC	1 uM	1	0.99998 fl
+Raf	1.4 uM	0	1 fl
+act_Raf	0 uM	0	1 fl
+Ca	0.08 uM	0	1 fl
+Ca_input	0.08 uM	1	1 fl
+inact_phosphatase	1 uM	0	1 fl
+reg_phosphatase	0 uM	0	1 fl
+channel	1 uM	0	1 fl
+channel_p	0 uM	0	1 fl
+CaM	2 uM	0	1 fl
+CaM-Ca3	0 uM	0	1 fl
+CaM-Ca2	0 uM	0	1 fl
+CaM-Ca	0 uM	0	1 fl
+CaM-Ca4	0 uM	0	1 fl
+CaM_xchange	0 uM	0	1 fl
+Ca	0.11111 uM	0	0.09 fl
+CaM	40 uM	0	0.09 fl
+CaM-Ca3	0 uM	0	0.09 fl
+CaM-Ca2	0 uM	0	0.09 fl
+CaM-Ca	0 uM	0	0.09 fl
+CaM-Ca4	0 uM	0	0.09 fl
+CaM_xchange	0 uM	0	0.09 fl
+
+
+-------------------------------------------
