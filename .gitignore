@@ -1,8 +1,13 @@
 /conv-env
 /simulations/codes/groups/data
+/simulations/codes/groups/activation_data
 /simulations/codes/groups/cam/data
 /simulations/codes/sequences/data
+/simulations/codes/sequences/activation_data
 /simulations/codes/sequences/chemical/data
 /simulations/codes/sequences/chemical/*.png
 /simulations/codes/sequences/electrical/data
+/simulations/codes/sequences/electrical/*.dat
+/simulations/figures/figure8/*.h5
+/simulations/figures/figure8/s11*
 *__pycache__*
