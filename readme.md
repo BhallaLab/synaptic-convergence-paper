@@ -221,12 +221,12 @@ command : ```python3 plot_figure7_cortex_cicr.py```
 
 - Figure 8B, C, D, E, F, G\
   Path : synaptic-convergence-paper/simulations/figures/figure8\
-  command:\ 
-      ```
-      ./runMAPKSeries.bat
-      ./runVmSeries.bat
-      ./runCaMSeries.bat
-      ```\
+  command: 
+  ```
+  ./runMAPKSeries.bat
+  ./runVmSeries.bat  
+  ./runCaMSeries.bat  
+  ```
 
 ### Plot generation
 
