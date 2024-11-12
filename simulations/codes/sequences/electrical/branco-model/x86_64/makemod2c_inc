@@ -1,0 +1,120 @@
+./ar.c: ../mod.files/ar.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "ar.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./ar.o: ./ar.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./cad.c: ../mod.files/cad.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "cad.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./cad.o: ./cad.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./caL3d.c: ../mod.files/caL3d.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "caL3d.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./caL3d.o: ./caL3d.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./ca.c: ../mod.files/ca.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "ca.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./ca.o: ./ca.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./CaT.c: ../mod.files/CaT.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "CaT.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./CaT.o: ./CaT.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./HH2.c: ../mod.files/HH2.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "HH2.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./HH2.o: ./HH2.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./h.c: ../mod.files/h.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "h.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./h.o: ./h.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./inwardrect.c: ../mod.files/inwardrect.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "inwardrect.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./inwardrect.o: ./inwardrect.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./kca.c: ../mod.files/kca.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kca.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./kca.o: ./kca.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./kir.c: ../mod.files/kir.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kir.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./kir.o: ./kir.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./km.c: ../mod.files/km.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "km.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./km.o: ./km.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./kv.c: ../mod.files/kv.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "kv.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./kv.o: ./kv.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./na.c: ../mod.files/na.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "na.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./na.o: ./na.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./NMDA_Mg_T.c: ../mod.files/NMDA_Mg_T.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "NMDA_Mg_T.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./NMDA_Mg_T.o: ./NMDA_Mg_T.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+
+./release_BMK.c: ../mod.files/release_BMK.mod
+	@printf " -> $(C_GREEN)NMODL$(C_RESET) $<\\n"
+	(cd "../mod.files";  MODLUNIT=$(NRNUNITS) $(NOCMODL) "release_BMK.mod" -o "/home/bhanu/work/bhalla_lab_github/synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model/x86_64")
+
+./release_BMK.o: ./release_BMK.c
+	@printf " -> $(C_GREEN)Compiling$(C_RESET) $<\\n"
+	$(COMPILE) -I"../mod.files" $(INCLUDES) -fPIC -c $< -o $@
+

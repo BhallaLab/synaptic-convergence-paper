@@ -43,7 +43,7 @@ nrncontrolmenu()
 
 // read file with stimulation order
 objref morder, forder
-forder = new File("./synapse_order_5.dat")
+forder = new File("./synapse_order.dat")
 forder.ropen()
 morder = new Matrix()
 morder.scanf(forder)
@@ -53,24 +53,12 @@ nSeq = morder.nrow   //number of different sequences to test
 
 
 //setup recording vectors
-objref storev, recv, storeMes, storedv1, storedv2, storedv3, recdv1, recdv2, recdv3
+objref storev, recv, storeMes
 storev = new Matrix(tstop/dt, nTs*nSeq)  //to store the somatic voltage trace for different intervals on one sequence
 recv = new Vector()
 recv.record(&soma.v(0.5))
 storeMes = new Matrix(nTs, nSeq) //to store the EPSP peak for each condition
 
-dendid = mloc.x[0][0]
-storedv1 = new Matrix(tstop/dt, nTs*nSeq)  //to store the dendritic voltage trace for different intervals on one sequence
-recdv1 = new Vector()
-recdv1.record(&dend[dendid].v(0.25))
-
-storedv2 = new Matrix(tstop/dt, nTs*nSeq)  //to store the dendritic voltage trace for different intervals on one sequence
-recdv2 = new Vector()
-recdv2.record(&dend[dendid].v(0.5))
-
-storedv3 = new Matrix(tstop/dt, nTs*nSeq)  //to store the dendritic voltage trace for different intervals on one sequence
-recdv3 = new Vector()
-recdv3.record(&dend[dendid].v(0.75))
 
 objref r
 r = new Random()
@@ -85,26 +73,15 @@ for n = 0, nSeq-1 {
 	tonset = 50
 	for od=0, nsyn-1 {  
 	    s  = morder.x[n][od] 
-	    cAMPA[s].onset = tonset+od*ti
-	    PRE[s].del_rel = tonset+od*ti
+	    jitter = r.uniform(-0, 0)  //to introduce jitter as in Fig. S14
+	    cAMPA[s].onset = tonset+od*ti + jitter
+	    PRE[s].del_rel = tonset+od*ti + jitter
 	} 
 	run()
 
 	for t = 0, storev.nrow-1 {
 	    storev.x[t][ti+n*nTs] = recv.x[t]  
 	    recv.x[t] = recv.x[t] - v_init
-	}
-	for t = 0, storedv1.nrow-1 {
-	    storedv1.x[t][ti+n*nTs] = recdv1.x[t]  
-	    recdv1.x[t] = recdv1.x[t] - v_init
-	}
-	for t = 0, storedv2.nrow-1 {
-	    storedv2.x[t][ti+n*nTs] = recdv2.x[t]  
-	    recdv2.x[t] = recdv2.x[t] - v_init
-	}
-	for t = 0, storedv3.nrow-1 {
-	    storedv3.x[t][ti+n*nTs] = recdv3.x[t]  
-	    recdv3.x[t] = recdv3.x[t] - v_init
 	}
 	storeMes.x[ti][n] = recv.max()
     }
@@ -113,26 +90,14 @@ for n = 0, nSeq-1 {
 
 
 //save data
-objref savv, savm, savdv1, savdv2, savdv3
+objref savv, savm
 savv = new File()
 savm = new File()
-savdv1 = new File()
-savdv2 = new File()
-savdv3 = new File()
-savv.wopen("./tempV_5_panelC.dat")
-savm.wopen("./tempM_5_panelC.dat")
-savdv1.wopen("./tempdendV_5_panelC_25.dat")
-savdv2.wopen("./tempdendV_5_panelC_50.dat")
-savdv3.wopen("./tempdendV_5_panelC_75.dat")
+savv.wopen("./tempV.dat")
+savm.wopen("./tempM.dat")
 storev.fprint(0, savv, "%f ")
 storeMes.fprint(0, savm, "%f ")  
-storedv1.fprint(0, savdv1, "%f ")
-storedv2.fprint(0, savdv2, "%f ")
-storedv3.fprint(0, savdv3, "%f ")
 savv.close()
 savm.close()
-savdv1.close()
-savdv2.close()
-savdv3.close()
 
 
