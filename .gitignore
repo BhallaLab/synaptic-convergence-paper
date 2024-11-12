@@ -8,6 +8,7 @@
 /simulations/codes/sequences/chemical/*.png
 /simulations/codes/sequences/electrical/data
 /simulations/codes/sequences/electrical/*.dat
+/simulations/codes/sequences/electrical/branco-model/*.dat
 /simulations/figures/figure8/*.h5
 /simulations/figures/figure8/s11*
 *__pycache__*
