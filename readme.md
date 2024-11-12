@@ -184,6 +184,24 @@ Path : synaptic-convergence-paper/simulations/figures/figure6\
 command : ```python3 plot_ectopic_responses.py```
 
 
+## Figure 6 - Supplement 2
+
+### Data generation
+
+  Path : synaptic-convergence-paper/simulations/codes/sequences/electrical\
+  command : ```python3 main.py```\
+  _Note that the mosinit.hoc file will need to first call init_sim.hoc. The command needs to be run separately for sequences of sequence lengths of 5 and 9 by changing the appropriate file names within both the hoc files. Ensure that all the dependent files for each sequence length are present. Accordingly use synapse_order_<sequence_length>.dat in init_sim.hoc. Use synapse_loc_<sequence_length>.dat in init_synapses.hoc. Use The output needs to be redirected to tempV_<sequence_length>_panelC.dat and tempM_<sequence_length>_panelC.dat as well in init_sim.hoc. Redirect the other output files appropriately_
+  _Repeat the above step by replacing the init_sim.hoc with init_sim_without_nmda.hoc in mosinit.hoc. All the file names for sequence lengths 5 and 9 will have to be changed as per above instructions in init_sim_without_nmda.hoc and init_synapses_without_nmda.hoc accordingly._
+  
+  Path : synaptic-convergence-paper/simulations/codes/sequences/electrical/branco-model\
+  _Run mosinit.hoc with init_sim.hoc and init_sim_without_nmda.hoc separately._
+
+### Plot generation
+
+Path : synaptic-convergence-paper/simulations/figures/figure6\
+command : ```python3 plot_figure6_supplement2.py```
+
+
 
 ## Figure 7
 
