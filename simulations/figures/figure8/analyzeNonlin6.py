@@ -3,6 +3,9 @@ import pandas as pd
 import argparse
 import matplotlib.pyplot as plt
 
+AMPAR_gmax = 0.157  # nS
+NMDAR_gmax = 0.063  # nS
+
 
 def extractStats(fname):
     # Read from HDF5
@@ -40,14 +43,14 @@ def doPlot(ax, xtab, ytab, panel, xlabel, ylabel):
     print("Plotting: ", panel, ylabel, xlabel)
     ax.plot(xtab, ytab)
     ax.tick_params(axis="both", which="major", labelsize=14)
-    ax.set_xlabel(xlabel, fontsize=16)
-    ax.set_ylabel(ylabel, fontsize=16)
+    ax.set_xlabel(xlabel, fontsize=12)
+    ax.set_ylabel(ylabel, fontsize=12)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
     # ax.set_title( title )
     ax.set_ylim(0, max(ytab) * 1.1)
     # ax.legend( fontsize = 14, frameon = False )
-    ax.text(-0.15, 1.05, panel, fontsize=18, weight="bold", transform=ax.transAxes)
+    ax.text(-0.15, 1.05, panel, fontsize=14, weight="bold", transform=ax.transAxes)
     # ax.set_ylim( -75, -55 )
 
 
@@ -59,14 +62,31 @@ def main():
     gs = fig.add_gridspec(2, 3)
 
     ################################################
-    xtab = [5, 10, 15, 20, 25, 30, 35, 40]
+    xtab = np.array([5, 10, 15, 20, 25, 30, 35, 40])
     ytab = []
     for wt in xtab:
         ret = extractStats("out7_frq1.0_Dt0.01_Dx6_N7_seq_p0_w{}.0.h5".format(wt))
         ytab.append(ret[vmIdx])
 
     ax = fig.add_subplot(gs[1, 0])
-    doPlot(ax, xtab, ytab, "C", "Syn Weight (S/m^2)", "Vm (mV)")
+    doPlot(
+        ax,
+        xtab * AMPAR_gmax,
+        ytab,
+        "C",
+        "$g_{max\_AMPAR}$ (nS)",
+        "Vm (mV)",
+    )
+    ax2 = ax.twiny()
+    doPlot(
+        ax2,
+        xtab * NMDAR_gmax,
+        ytab,
+        "C",
+        "$g_{max\_NMDAR}$ (nS)",
+        "Vm (mV)",
+    )
+    ax2.spines["top"].set_visible(True)
     ################################################
 
     xtab = [1, 2, 3, 4, 5, 6, 8, 10]
@@ -79,13 +99,30 @@ def main():
     doPlot(ax, nxtab, ytab, "B", "Syn Spacing (microns)", "Vm (mV)")
     ################################################
 
-    xtab = [5, 10, 15, 20, 25, 30, 35, 40]
+    xtab = np.array([5, 10, 15, 20, 25, 30, 35, 40])
     ytab = []
     for wt in xtab:
         ret = extractStats("out7_frq20.0_Dt3.0_Dx2_N5_seq_p0_w{}.0.h5".format(wt))
         ytab.append(ret[mapkIdx])
     ax = fig.add_subplot(gs[1, 2])
-    doPlot(ax, xtab, ytab, "G", "Syn Weight (S/m^2)", "MAPK-p (AUC)")
+    doPlot(
+        ax,
+        xtab * AMPAR_gmax,
+        ytab,
+        "G",
+        "$g_{max\_AMPAR}$ (nS)",
+        "MAPK-p (AUC)",
+    )
+    ax2 = ax.twiny()
+    doPlot(
+        ax2,
+        xtab * NMDAR_gmax,
+        ytab,
+        "G",
+        "$g_{max\_NMDAR}$ (nS)",
+        "MAPK-p (AUC)",
+    )
+    ax2.spines["top"].set_visible(True)
     ################################################
 
     xtab = [1, 2, 3, 4, 5, 6, 8, 10]
@@ -98,13 +135,31 @@ def main():
     doPlot(ax, nxtab, ytab, "F", "Syn Spacing (microns)", "MAPK-p (AUC)")
     ################################################
 
-    xtab = [5, 10, 15, 20, 25, 30, 35, 40]
+    xtab = np.array([5, 10, 15, 20, 25, 30, 35, 40])
     ytab = []
     for wt in xtab:
         ret = extractStats("out7_frq10.0_Dt1.0_Dx1_N5_grp_p0_w{}.0.h5".format(wt))
         ytab.append(ret[camIdx])
     ax = fig.add_subplot(gs[1, 1])
-    doPlot(ax, xtab, ytab, "E", "Syn Weight (S/m^2)", "Ca4.CaM (AUC)")
+    doPlot(
+        ax,
+        xtab * AMPAR_gmax,
+        ytab,
+        "E",
+        "$g_{max\_AMPAR}$ (nS)",
+        "Ca4.CaM (AUC)",
+    )
+    ax2 = ax.twiny()
+    doPlot(
+        ax2,
+        xtab * NMDAR_gmax,
+        ytab,
+        "E",
+        "$g_{max\_NMDAR}$ (nS)",
+        "Ca4.CaM (AUC)",
+    )
+    ax2.spines["top"].set_visible(True)
+
     ################################################
 
     xtab = [1, 2, 3, 4, 5]
