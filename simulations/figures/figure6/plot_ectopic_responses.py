@@ -203,6 +203,7 @@ def main():
     plt.figtext(0.01, 0.68, "B", fontsize=16, weight="bold")
     plt.figtext(0.01, 0.33, "C", fontsize=16, weight="bold")
 
+    plt.savefig("ectopic_responses.svg", bbox_inches="tight")
     plt.savefig("ectopic_responses.png", bbox_inches="tight")
     plt.show()
 
