@@ -1,4 +1,4 @@
-This readme describes the steps to reproduce the paper figures
+This readme describes the steps to reproduce the paper figures for [Somashekar and Bhalla, 2025](https://doi.org/10.7554/eLife.100664.4)
 
 
 ## Software versions
