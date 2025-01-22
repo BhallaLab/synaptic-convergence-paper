@@ -83,6 +83,8 @@ def plot_prob_for_a_fraction(ax, net, m):
 
 def main():
     figure, ax = plt.subplots(1, 2, figsize=(9, 4), constrained_layout=True)
+    plt.figtext(0.01, 0.96, "A", fontsize=12, weight="bold")
+    plt.figtext(0.50, 0.96, "B", fontsize=12, weight="bold")
 
     plot_prob_for_a_fraction(ax[0], networks[0], 2)
     ax[0].set_title("Chem & CICR")
